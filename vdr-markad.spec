@@ -1,6 +1,6 @@
-%global commit 3c99d4782fa62a1e24aabb510ce6230dc00a5b31
+%global commit c55f43f413dff8740f99d684e8879835d4409920
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global gitdate 20140421
+%global gitdate 20140902
 
 Name:           vdr-markad
 Version:        0.1.4
@@ -68,8 +68,8 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
-* Thu Aug 07 2014 Sérgio Basto <sergio@serjux.com> - 0.1.4-5.20140421git3c99d47
-- Rebuilt for ffmpeg-2.3
+* Tue Sep 02 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-5.20140902gitc55f43f
+- rebuild for new git version
 
 * Fri May 02 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-4.20140421git3c99d47
 - removed %%config(noreplace) flag in %%file section for logo dir
