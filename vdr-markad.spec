@@ -4,7 +4,7 @@
 
 Name:           vdr-markad
 Version:        0.1.4
-Release:        5.%{gitdate}git%{shortcommit}%{?dist}
+Release:        6.%{gitdate}git%{shortcommit}%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 # how to get the tarball
@@ -68,6 +68,9 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
+* Mon Oct 20 2014 Sérgio Basto <sergio@serjux.com> - 0.1.4-6.20140902gitc55f43f
+- Rebuilt for FFmpeg 2.4.3
+
 * Tue Sep 02 2014 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-5.20140902gitc55f43f
 - rebuild for new git version
 
