@@ -1,10 +1,10 @@
-%global commit c55f43f413dff8740f99d684e8879835d4409920
+%global commit  53454360c279844d0783b70cde023fecfc8ea69a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global gitdate 20140902
+%global gitdate 20150926
 
 Name:           vdr-markad
 Version:        0.1.4
-Release:        6.%{gitdate}git%{shortcommit}%{?dist}
+Release:        7.%{gitdate}git%{shortcommit}%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 # how to get the tarball
@@ -68,6 +68,9 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
+* Fri Oct 02 2015 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-7.20150926git5345436
+- rebuild for new git version
+
 * Mon Oct 20 2014 Sérgio Basto <sergio@serjux.com> - 0.1.4-6.20140902gitc55f43f
 - Rebuilt for FFmpeg 2.4.3
 
