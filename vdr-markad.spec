@@ -1,17 +1,17 @@
-%global commit  74e2a8c5382fa8bfacd12274899112724a1e0d51
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
+%global commit0  74e2a8c5382fa8bfacd12274899112724a1e0d51
+%global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global gitdate 20151016
 
 Name:           vdr-markad
 Version:        0.1.4
-Release:        8.%{gitdate}git%{shortcommit}%{?dist}
+Release:        9.%{gitdate}git%{shortcommit0}%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 # how to get the tarball
 # go to http://projects.vdr-developer.org/git/vdr-plugin-markad.git/commit/
 # click the link behind commit, then select the download links below.
 URL:            http://projects.vdr-developer.org/projects/plg-markad
-Source0:        http://projects.vdr-developer.org/git/vdr-plugin-markad.git/snapshot/vdr-plugin-markad-%{commit}.tar.bz2
+Source0:        http://projects.vdr-developer.org/git/vdr-plugin-markad.git/snapshot/vdr-plugin-markad-%{commit0}.tar.bz2
 Source1:        %{name}.conf
 
 BuildRequires:  vdr-devel >= 1.7.30
@@ -22,7 +22,11 @@ Requires:       vdr(abi)%{?_isa} = %{vdr_apiversion}
 VDR-Plugin: markad - %{summary}
 
 %prep
-%setup -qn vdr-plugin-markad-%{commit}
+%setup -qn vdr-plugin-markad-%{commit0}
+
+# ffmpeg3 patch
+# replaced function avcodec_alloc_frame(); by  av_frame_alloc();
+sed -i -e 's|avcodec_alloc_frame()|av_frame_alloc()|g'  command/decoder.cpp
 
 %build
 make CFLAGS="%{optflags} -fPIC" CXXFLAGS="%{optflags} -fPIC" %{?_smp_mflags} \
@@ -68,6 +72,9 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
+* Wed Jun 29 2016 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-9.20151016git74e2a8c
+- replaced function avcodec_alloc_frame(); by av_frame_alloc(); due ffmpeg3 version
+
 * Sat Oct 17 2015 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-8.20151016git74e2a8c
 - rebuild for new git version
 
