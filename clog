@@ -1,0 +1,2 @@
+replaced function avcodec_alloc_frame(); by av_frame_alloc(); due ffmpeg3 version
+
