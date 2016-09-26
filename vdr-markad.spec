@@ -1,10 +1,10 @@
-%global commit0  74e2a8c5382fa8bfacd12274899112724a1e0d51
+%global commit0 3681d3a18383c238870de7d1ec1f1f9c8079cf89
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
-%global gitdate 20151016
+%global gitdate 20160925
 
 Name:           vdr-markad
 Version:        0.1.4
-Release:        9.%{gitdate}git%{shortcommit0}%{?dist}
+Release:        11.%{gitdate}git%{shortcommit0}%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 # how to get the tarball
@@ -72,6 +72,12 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
+* Mon Sep 26 2016 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-11.20160925git3681d3a
+- rebuild for new git version
+
+* Sat Jul 30 2016 Julian Sikorski <belegdol@fedoraproject.org> - 0.1.4-10.20151016git74e2a8c
+- Rebuilt for ffmpeg-3.1.1
+
 * Wed Jun 29 2016 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-9.20151016git74e2a8c
 - replaced function avcodec_alloc_frame(); by av_frame_alloc(); due ffmpeg3 version
 
