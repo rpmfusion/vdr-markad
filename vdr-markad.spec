@@ -1,6 +1,6 @@
-%global commit0 3681d3a18383c238870de7d1ec1f1f9c8079cf89
+%global commit0 ea2e182ec798375f3830f8b794e7408576f139ad
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
-%global gitdate 20160925
+%global gitdate 20170313
 
 Name:           vdr-markad
 Version:        0.1.4
@@ -66,14 +66,14 @@ fi
 %files -f %{name}.lang
 %doc COPYING README HISTORY
 %config(noreplace) %{_sysconfdir}/sysconfig/vdr-plugins.d/markad.conf
-%{_mandir}/man1/markad.1.gz
+%{_mandir}/man1/markad.1.*
 %{_bindir}/markad
 %{_libdir}/vdr/libvdr-markad.so.%{vdr_apiversion}
 %{vdr_vardir}/markad/
 
 %changelog
-* Mon Mar 20 2017 RPM Fusion Release Engineering <kwizart@rpmfusion.org> - 0.1.4-12.20160925git3681d3a
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+* Fri Mar 24 2017 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-12.20170313gitea2e182
+- rebuild for new git version
 
 * Mon Sep 26 2016 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-11.20160925git3681d3a
 - rebuild for new git version
