@@ -2,9 +2,15 @@
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global gitdate 20170313
 
+%if 0%{?fedora} > 27
+%bcond_without  compat_ffmpeg
+%else
+%bcond_with     compat_ffmpeg
+%endif
+
 Name:           vdr-markad
 Version:        0.1.4
-Release:        15.%{gitdate}git%{shortcommit0}%{?dist}
+Release:        16.%{gitdate}git%{shortcommit0}%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 # how to get the tarball
@@ -15,7 +21,11 @@ Source0:        http://projects.vdr-developer.org/git/vdr-plugin-markad.git/snap
 Source1:        %{name}.conf
 
 BuildRequires:  vdr-devel >= 1.7.30
+%if %{with compat_ffmpeg}
+BuildRequires: compat-ffmpeg28-devel
+%else
 BuildRequires:  ffmpeg-devel
+%endif
 Requires:       vdr(abi)%{?_isa} = %{vdr_apiversion}
 
 %description
@@ -24,11 +34,17 @@ VDR-Plugin: markad - %{summary}
 %prep
 %setup -qn vdr-plugin-markad-%{commit0}
 
+%if ! %{with compat_ffmpeg}
 # ffmpeg3 patch
 # replaced function avcodec_alloc_frame(); by  av_frame_alloc();
 sed -i -e 's|avcodec_alloc_frame()|av_frame_alloc()|g'  command/decoder.cpp
+%endif
+
 
 %build
+%if %{with compat_ffmpeg}
+export PKG_CONFIG_PATH=%{_libdir}/compat-ffmpeg28/pkgconfig
+%endif
 make CFLAGS="%{optflags} -fPIC" CXXFLAGS="%{optflags} -fPIC" %{?_smp_mflags} \
     LIBDIR=. VDRDIR=%{_libdir}/vdr VDRINCDIR=%{_includedir} \
     LOCALEDIR=./locale all
@@ -72,6 +88,9 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
+* Mon Feb 26 2018 Leigh Scott <leigh123linux@googlemail.com> - 0.1.4-16.20170313gitea2e182
+- Use compat-ffmpeg28 for F28
+
 * Thu Jan 18 2018 Leigh Scott <leigh123linux@googlemail.com> - 0.1.4-15.20170313gitea2e182
 - Rebuilt for ffmpeg-3.5 git
 
