@@ -10,7 +10,7 @@
 
 Name:           vdr-markad
 Version:        0.1.4
-Release:        17.%{gitdate}git%{shortcommit0}%{?dist}
+Release:        18.%{gitdate}git%{shortcommit0}%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 # how to get the tarball
@@ -88,6 +88,9 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
+* Sun Aug 19 2018 Leigh Scott <leigh123linux@googlemail.com> - 0.1.4-18.20170313gitea2e182
+- Rebuilt for Fedora 29 Mass Rebuild binutils issue
+
 * Fri Jul 27 2018 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 0.1.4-17.20170313gitea2e182
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
