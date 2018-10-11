@@ -10,7 +10,7 @@
 
 Name:           vdr-markad
 Version:        0.1.4
-Release:        18.%{gitdate}git%{shortcommit0}%{?dist}
+Release:        19.%{gitdate}git%{shortcommit0}%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 # how to get the tarball
@@ -20,6 +20,7 @@ URL:            http://projects.vdr-developer.org/projects/plg-markad
 Source0:        http://projects.vdr-developer.org/git/vdr-plugin-markad.git/snapshot/vdr-plugin-markad-%{commit0}.tar.bz2
 Source1:        %{name}.conf
 
+BuildRequires:  gcc-c++
 BuildRequires:  vdr-devel >= 1.7.30
 %if %{with compat_ffmpeg}
 BuildRequires: compat-ffmpeg28-devel
@@ -88,6 +89,9 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
+* Thu Oct 11 2018 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-19.20170313gitea2e182
+- Add BR gcc-c++
+
 * Sun Aug 19 2018 Leigh Scott <leigh123linux@googlemail.com> - 0.1.4-18.20170313gitea2e182
 - Rebuilt for Fedora 29 Mass Rebuild binutils issue
 
