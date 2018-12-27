@@ -2,12 +2,6 @@
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global gitdate 20170313
 
-%if 0%{?fedora} > 27
-%bcond_without  compat_ffmpeg
-%else
-%bcond_with     compat_ffmpeg
-%endif
-
 Name:           vdr-markad
 Version:        0.1.4
 Release:        20.%{gitdate}git%{shortcommit0}%{?dist}
@@ -19,32 +13,21 @@ License:        GPLv2+
 URL:            http://projects.vdr-developer.org/projects/plg-markad
 Source0:        http://projects.vdr-developer.org/git/vdr-plugin-markad.git/snapshot/vdr-plugin-markad-%{commit0}.tar.bz2
 Source1:        %{name}.conf
+#Patch0:         markad_ffmpeg4.diff 
+Patch0:         %{name}-ffmpeg4-fix.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  vdr-devel >= 1.7.30
-%if %{with compat_ffmpeg}
-BuildRequires: compat-ffmpeg28-devel
-%else
 BuildRequires:  ffmpeg-devel
-%endif
 Requires:       vdr(abi)%{?_isa} = %{vdr_apiversion}
 
 %description
 VDR-Plugin: markad - %{summary}
 
 %prep
-%autosetup p1 1 -n vdr-plugin-markad-%{commit0}
-
-%if ! %{with compat_ffmpeg}
-# ffmpeg3 patch
-# replaced function avcodec_alloc_frame(); by  av_frame_alloc();
-sed -i -e 's|avcodec_alloc_frame()|av_frame_alloc()|g'  command/decoder.cpp
-%endif
+%autosetup -p 1 -n vdr-plugin-markad-%{commit0}
 
 %build
-%if %{with compat_ffmpeg}
-export PKG_CONFIG_PATH=%{_libdir}/compat-ffmpeg28/pkgconfig
-%endif
 make CFLAGS="%{optflags} -fPIC" CXXFLAGS="%{optflags} -fPIC" %{?_smp_mflags} \
     LIBDIR=. VDRDIR=%{_libdir}/vdr VDRINCDIR=%{_includedir} \
     LOCALEDIR=./locale all
@@ -89,7 +72,7 @@ fi
 
 %changelog
 * Thu Dec 27 2018 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-20.20170313gitea2e182
-- Add markad_ffmpeg4.diff
+- Add vdr-markad-ffmpeg4-fix.patch
 
 * Thu Oct 11 2018 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-19.20170313gitea2e182
 - Add BR gcc-c++
