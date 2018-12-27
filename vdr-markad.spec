@@ -10,7 +10,7 @@
 
 Name:           vdr-markad
 Version:        0.1.4
-Release:        19.%{gitdate}git%{shortcommit0}%{?dist}
+Release:        20.%{gitdate}git%{shortcommit0}%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 # how to get the tarball
@@ -33,14 +33,13 @@ Requires:       vdr(abi)%{?_isa} = %{vdr_apiversion}
 VDR-Plugin: markad - %{summary}
 
 %prep
-%setup -qn vdr-plugin-markad-%{commit0}
+%autosetup p1 1 -n vdr-plugin-markad-%{commit0}
 
 %if ! %{with compat_ffmpeg}
 # ffmpeg3 patch
 # replaced function avcodec_alloc_frame(); by  av_frame_alloc();
 sed -i -e 's|avcodec_alloc_frame()|av_frame_alloc()|g'  command/decoder.cpp
 %endif
-
 
 %build
 %if %{with compat_ffmpeg}
@@ -89,6 +88,9 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
+* Thu Dec 27 2018 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-20.20170313gitea2e182
+- Add markad_ffmpeg4.diff
+
 * Thu Oct 11 2018 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-19.20170313gitea2e182
 - Add BR gcc-c++
 
