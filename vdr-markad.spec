@@ -13,7 +13,6 @@ License:        GPLv2+
 URL:            http://projects.vdr-developer.org/projects/plg-markad
 Source0:        http://projects.vdr-developer.org/git/vdr-plugin-markad.git/snapshot/vdr-plugin-markad-%{commit0}.tar.bz2
 Source1:        %{name}.conf
-#Patch0:         markad_ffmpeg4.diff 
 Patch0:         %{name}-ffmpeg4-fix.patch
 
 BuildRequires:  gcc-c++
@@ -73,6 +72,7 @@ fi
 %changelog
 * Thu Dec 27 2018 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-20.20170313gitea2e182
 - Add vdr-markad-ffmpeg4-fix.patch
+- Spec file cleanup
 
 * Thu Oct 11 2018 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-19.20170313gitea2e182
 - Add BR gcc-c++
