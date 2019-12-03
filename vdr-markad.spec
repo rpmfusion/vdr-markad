@@ -1,11 +1,10 @@
 %global commit0 ea2e182ec798375f3830f8b794e7408576f139ad
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global gitdate 20170313
-%global sname markad
 
 Name:           vdr-markad
 Version:        0.1.4
-Release:        26.%{gitdate}git%{shortcommit0}%{?dist}
+Release:        27.%{gitdate}git%{shortcommit0}%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 # how to get the tarball
@@ -20,7 +19,7 @@ Patch2:         02-deprecated-V0-04.diff
 Patch3:         03-markad-decoder-V0-24.diff
 BuildRequires:  gcc-c++
 BuildRequires:  vdr-devel >= 1.7.30
-BuildRequires:  ffmpeg-devel
+BuildRequires:  ffmpeg-devel >= 4.2.1
 Requires:       vdr(abi)%{?_isa} = %{vdr_apiversion}
 
 %description
@@ -29,13 +28,11 @@ VDR-Plugin: markad - %{summary}
 %prep
 %autosetup -p 1 -n vdr-plugin-markad-%{commit0}
 
-sed -i -e 's|$(DESTDIR)/var/lib/markad|$(DESTDIR)/var/lib/vdr/data/markad|' command/Makefile
+sed -i -e 's|$(DESTDIR)/var/lib/markad|$(DESTDIR)%{vdr_vardir}/markad/|' command/Makefile
 sed -i -e 's|/LC_MESSAGES/markad.mo|/LC_MESSAGES/vdr-markad.mo|' command/Makefile
 
 %build
-make CFLAGS="%{optflags} -fPIC" CXXFLAGS="%{optflags} -fPIC" %{?_smp_mflags} \
-    LIBDIR=. VDRDIR=%{_libdir}/vdr VDRINCDIR=%{_includedir} \
-    LOCALEDIR=./locale all
+make CFLAGS="%{optflags} -fPIC" CXXFLAGS="%{optflags} -fPIC" all
 
 %install
 make install DESTDIR=%{buildroot}
@@ -61,6 +58,9 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
+* Tue Dec 03 2019 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-27.20170313gitea2e182
+- Cleanup spec file
+
 * Tue Dec 03 2019 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-26.20170313gitea2e182
 - Dropped vdr-markad-ffmpeg4-fix.patch
 - Add 00-markad-libavcodec58-V0-01.diff
