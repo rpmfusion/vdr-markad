@@ -1,10 +1,11 @@
 %global commit0 ea2e182ec798375f3830f8b794e7408576f139ad
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global gitdate 20170313
+%global sname markad
 
 Name:           vdr-markad
 Version:        0.1.4
-Release:        25.%{gitdate}git%{shortcommit0}%{?dist}
+Release:        26.%{gitdate}git%{shortcommit0}%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 # how to get the tarball
@@ -13,8 +14,10 @@ License:        GPLv2+
 URL:            http://projects.vdr-developer.org/projects/plg-markad
 Source0:        http://projects.vdr-developer.org/git/vdr-plugin-markad.git/snapshot/vdr-plugin-markad-%{commit0}.tar.bz2
 Source1:        %{name}.conf
-Patch0:         %{name}-ffmpeg4-fix.patch
-
+Patch0:         00-markad-libavcodec58-V0-01.diff
+Patch1:         01-markad-Makefile-V0-06.diff
+Patch2:         02-deprecated-V0-04.diff
+Patch3:         03-markad-decoder-V0-24.diff
 BuildRequires:  gcc-c++
 BuildRequires:  vdr-devel >= 1.7.30
 BuildRequires:  ffmpeg-devel
@@ -26,32 +29,20 @@ VDR-Plugin: markad - %{summary}
 %prep
 %autosetup -p 1 -n vdr-plugin-markad-%{commit0}
 
+sed -i -e 's|$(DESTDIR)/var/lib/markad|$(DESTDIR)/var/lib/vdr/data/markad|' command/Makefile
+sed -i -e 's|/LC_MESSAGES/markad.mo|/LC_MESSAGES/vdr-markad.mo|' command/Makefile
+
 %build
 make CFLAGS="%{optflags} -fPIC" CXXFLAGS="%{optflags} -fPIC" %{?_smp_mflags} \
     LIBDIR=. VDRDIR=%{_libdir}/vdr VDRINCDIR=%{_includedir} \
     LOCALEDIR=./locale all
 
 %install
-install -dm 755 $RPM_BUILD_ROOT%{vdr_plugindir}
-install -pm 755 plugin/libvdr-markad.so.%{vdr_apiversion} $RPM_BUILD_ROOT%{vdr_plugindir}
+make install DESTDIR=%{buildroot}
+
+install -dm 755 %{buildroot}%{vdr_plugindir}
 install -Dpm 644 %{SOURCE1} \
-  $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/vdr-plugins.d/markad.conf
-
-install -dm 755 $RPM_BUILD_ROOT%{_bindir}
-install -pm 755 command/markad $RPM_BUILD_ROOT%{_bindir}
-
-# locale
-install -dm 755 $RPM_BUILD_ROOT%{_datadir}/locale
-cp -pR plugin/locale/* $RPM_BUILD_ROOT%{_datadir}/locale
-
-# copy logos
-install -dm 755 $RPM_BUILD_ROOT%{vdr_vardir}/markad/logos
-cp -pR command/logos/* $RPM_BUILD_ROOT%{vdr_vardir}/markad/logos
-
-# install man
-pushd command
-make install-doc DESTDIR=$RPM_BUILD_ROOT
-popd
+  %{buildroot}%{_sysconfdir}/sysconfig/vdr-plugins.d/markad.conf
 
 %find_lang %{name}
 
@@ -70,6 +61,13 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
+* Tue Dec 03 2019 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-26.20170313gitea2e182
+- Dropped vdr-markad-ffmpeg4-fix.patch
+- Add 00-markad-libavcodec58-V0-01.diff
+- Add 01-markad-Makefile-V0-06.diff
+- Add 02-deprecated-V0-04.diff
+- Add 04-markad-decoder-V0-24.diff
+
 * Wed Aug 07 2019 Leigh Scott <leigh123linux@gmail.com> - 0.1.4-25.20170313gitea2e182
 - Rebuild for new ffmpeg version
 
