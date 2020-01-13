@@ -22,7 +22,7 @@ Patch3:         03-markad-decoder-V0-59.diff
 
 BuildRequires:  gcc-c++
 BuildRequires:  vdr-devel >= 1.7.30
-BuildRequires:  ffmpeg-devel >= 4.2.1
+BuildRequires:  ffmpeg-devel >= 4.1
 Requires:       vdr(abi)%{?_isa} = %{vdr_apiversion}
 
 %description
