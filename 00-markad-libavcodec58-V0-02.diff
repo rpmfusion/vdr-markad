@@ -1,6 +1,6 @@
 diff -u -r --new-file '--exclude=logos' '--exclude=version.h' '--exclude=po' a/command/decoder.cpp b/command/decoder.cpp
---- a/command/decoder.cpp	2019-11-24 21:19:25.993386029 +0000
-+++ b/command/decoder.cpp	2019-11-25 20:52:15.916895405 +0000
+--- a/command/decoder.cpp	2020-01-11 10:19:55.231477591 +0000
++++ b/command/decoder.cpp	2020-01-11 11:01:04.016968280 +0000
 @@ -103,18 +103,18 @@
  #endif
  
@@ -36,7 +36,7 @@ diff -u -r --new-file '--exclude=logos' '--exclude=version.h' '--exclude=po' a/c
      }
      else
      {
-+#if LIBAVCODEC_VERSION_INT >= ((58<<16)+(54<<8)+100)
++#if LIBAVCODEC_VERSION_INT >= ((58<<16)+(35<<8)+100)
 +        video_codecid=AV_CODEC_ID_MPEG2VIDEO;
 +#else
          video_codecid=AV_CODEC_ID_MPEG2VIDEO_XVMC;
@@ -44,7 +44,7 @@ diff -u -r --new-file '--exclude=logos' '--exclude=version.h' '--exclude=po' a/c
      }
 -
      video_codec = avcodec_find_decoder(video_codecid);
-+#if LIBAVCODEC_VERSION_INT < ((58<<16)+(54<<8)+100)
++#if LIBAVCODEC_VERSION_INT < ((58<<16)+(35<<8)+100)
      if ((!video_codec) && (video_codecid==AV_CODEC_ID_MPEG2VIDEO_XVMC))
      {
          // fallback to MPEG2VIDEO
@@ -59,7 +59,7 @@ diff -u -r --new-file '--exclude=logos' '--exclude=version.h' '--exclude=po' a/c
  #endif
          if (video_context)
          {
-+#if LIBAVCODEC_VERSION_INT >= ((58<<16)+(54<<8)+100)
++#if LIBAVCODEC_VERSION_INT >= ((58<<16)+(35<<8)+100)
 +            if (video_codec->capabilities & AV_CODEC_CAP_TRUNCATED)
 +                video_context->flags|=AV_CODEC_FLAG_TRUNCATED; // we do not send complete frames
 +            video_context->flags|=AV_CODEC_FLAG_LOW_DELAY;
@@ -76,7 +76,7 @@ diff -u -r --new-file '--exclude=logos' '--exclude=version.h' '--exclude=po' a/c
              {
                  video_context->skip_frame=AVDISCARD_NONKEY; // just I-frames
              } else {
-+#if LIBAVCODEC_VERSION_INT >= ((58<<16)+(54<<8)+100)
++#if LIBAVCODEC_VERSION_INT >= ((58<<16)+(35<<8)+100)
 +                video_context->flags2|=AV_CODEC_FLAG2_CHUNKS;
 +#else
                  video_context->flags2|=CODEC_FLAG2_CHUNKS;
@@ -88,7 +88,7 @@ diff -u -r --new-file '--exclude=logos' '--exclude=version.h' '--exclude=po' a/c
  #else
              int ret=avcodec_open(video_context, video_codec);
  #endif
-+#if LIBAVCODEC_VERSION_INT < ((58<<16)+(54<<8)+100)
++#if LIBAVCODEC_VERSION_INT < ((58<<16)+(35<<8)+100)
              if ((ret < 0) && (video_codecid==AV_CODEC_ID_MPEG2VIDEO_XVMC))
              {
                  // fallback to MPEG2VIDEO
@@ -124,7 +124,7 @@ diff -u -r --new-file '--exclude=logos' '--exclude=version.h' '--exclude=po' a/c
                  case AV_CODEC_ID_H264:
                      esyslog("could not open codec for H264");
                      break;
-+#if LIBAVCODEC_VERSION_INT < ((58<<16)+(54<<8)+100)
++#if LIBAVCODEC_VERSION_INT < ((58<<16)+(35<<8)+100)
                  case AV_CODEC_ID_MPEG2VIDEO_XVMC:
                      esyslog("could not open codec MPEG2 (XVMC)");
                      break;
@@ -136,7 +136,7 @@ diff -u -r --new-file '--exclude=logos' '--exclude=version.h' '--exclude=po' a/c
          case AV_CODEC_ID_H264:
              esyslog("codec for H264 not found");
              break;
-+#if LIBAVCODEC_VERSION_INT < ((58<<16)+(54<<8)+100)
++#if LIBAVCODEC_VERSION_INT < ((58<<16)+(35<<8)+100)
          case AV_CODEC_ID_MPEG2VIDEO_XVMC:
              esyslog("codec for MPEG2 (XVMC) not found");
 +#endif
@@ -144,8 +144,8 @@ diff -u -r --new-file '--exclude=logos' '--exclude=version.h' '--exclude=po' a/c
          case AV_CODEC_ID_MPEG2VIDEO:
              esyslog("codec for MPEG2 not found");
 diff -u -r --new-file '--exclude=logos' '--exclude=version.h' '--exclude=po' a/command/markad-standalone.cpp b/command/markad-standalone.cpp
---- a/command/markad-standalone.cpp	2019-11-24 21:19:26.029386427 +0000
-+++ b/command/markad-standalone.cpp	2019-11-25 21:22:42.619607452 +0000
+--- a/command/markad-standalone.cpp	2020-01-11 10:19:55.243477710 +0000
++++ b/command/markad-standalone.cpp	2020-01-11 10:55:55.665885206 +0000
 @@ -73,11 +73,12 @@
      }
      else
@@ -161,8 +161,8 @@ diff -u -r --new-file '--exclude=logos' '--exclude=version.h' '--exclude=po' a/c
          snprintf(fmt, sizeof(fmt), "%s%s [%d] %s", LOG2REC ? "":"markad: ",buf, getpid(), format);
          va_start(ap, format);
 diff -u -r --new-file '--exclude=logos' '--exclude=version.h' '--exclude=po' a/command/marks.h b/command/marks.h
---- a/command/marks.h	2019-11-24 21:19:26.029386427 +0000
-+++ b/command/marks.h	2019-11-25 21:46:15.441506332 +0000
+--- a/command/marks.h	2020-01-11 10:19:55.243477710 +0000
++++ b/command/marks.h	2020-01-11 10:55:55.665885206 +0000
 @@ -89,8 +89,9 @@
      {
          if (FileName)

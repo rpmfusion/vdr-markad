@@ -4,7 +4,7 @@
 
 Name:           vdr-markad
 Version:        0.1.4
-Release:        29.%{gitdate}git%{shortcommit0}%{?dist}
+Release:        30.%{gitdate}git%{shortcommit0}%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 # how to get the tarball
@@ -13,10 +13,13 @@ License:        GPLv2+
 URL:            http://projects.vdr-developer.org/projects/plg-markad
 Source0:        http://projects.vdr-developer.org/git/vdr-plugin-markad.git/snapshot/vdr-plugin-markad-%{commit0}.tar.bz2
 Source1:        %{name}.conf
-Patch0:         00-markad-libavcodec58-V0-01.diff
+Patch0:         00-markad-libavcodec58-V0-02.diff
 Patch1:         01-markad-Makefile-V0-06.diff
-Patch2:         02-deprecated-V0-04.diff
-Patch3:         03-markad-decoder-V0-31.diff
+Patch2:         02-markad-deprecated-V0-05.diff
+Patch3:         03-markad-decoder-V0-59.diff
+
+
+
 BuildRequires:  gcc-c++
 BuildRequires:  vdr-devel >= 1.7.30
 BuildRequires:  ffmpeg-devel >= 4.2.1
@@ -58,7 +61,12 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
-* Sun Dec 15 2019 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-28.20170313gitea2e182
+* Mon Jan 13 2020 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-30.20170313gitea2e182
+- Replace 00-markad-libavcodec58-V0-01.diff by 00-markad-libavcodec58-V0-02.diff
+- Replace 02-deprecated-V0-04.diff by 02-markad-deprecated-V0-05.diff
+- Replace 03-markad-decoder-V0-31.diff by 03-markad-decoder-V0-59.diff
+
+* Sun Dec 15 2019 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-29.20170313gitea2e182
 - Replace 03-markad-decoder-V0-31.diff by 03-markad-decoder-V0-50.diff
 
 * Thu Dec 05 2019 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-28.20170313gitea2e182

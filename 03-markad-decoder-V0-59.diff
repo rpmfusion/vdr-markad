@@ -1,6 +1,20 @@
+diff -u --new-file '--exclude=version.h' a/plugin/Makefile b/plugin/Makefile
+--- a/plugin/Makefile	2020-01-11 12:26:37.427878242 +0000
++++ b/plugin/Makefile	2020-01-11 12:26:37.607880056 +0000
+@@ -27,6 +27,10 @@
+ 
+ export CFLAGS   = $(call PKGCFG,cflags)
+ export CXXFLAGS = $(call PKGCFG,cxxflags)
++CXXVERION=$(shell $(CXX) -dumpversion)
++ifeq ($(CXXVERION),4.8)
++export CXXFLAGS += -std=c++11   # to prevent a lot of compiler warnings with Ubuntu 14.04
++endif
+ 
+ ### The version number of VDR's plugin API:
+ 
 diff -u --new-file '--exclude=version.h' a/plugin/markad.cpp b/plugin/markad.cpp
---- a/plugin/markad.cpp	2017-03-13 18:56:14.000000000 +0100
-+++ b/plugin/markad.cpp	2019-12-02 16:53:58.318943405 +0100
+--- a/plugin/markad.cpp	2020-01-11 10:19:55.247477749 +0000
++++ b/plugin/markad.cpp	2020-01-11 12:26:37.607880056 +0000
 @@ -54,10 +54,15 @@
  const char *cPluginMarkAd::CommandLineHelp(void)
  {
@@ -67,8 +81,8 @@ diff -u --new-file '--exclude=version.h' a/plugin/markad.cpp b/plugin/markad.cpp
      statusMonitor = new cStatusMarkAd(bindir,logodir,&setup);
      return (statusMonitor!=NULL);
 diff -u --new-file '--exclude=version.h' a/plugin/markad.h b/plugin/markad.h
---- a/plugin/markad.h	2017-03-13 18:56:14.000000000 +0100
-+++ b/plugin/markad.h	2019-12-02 16:53:58.318943405 +0100
+--- a/plugin/markad.h	2020-01-11 10:19:55.247477749 +0000
++++ b/plugin/markad.h	2020-01-11 12:26:37.607880056 +0000
 @@ -23,6 +23,9 @@
      cStatusMarkAd *statusMonitor;
      char *bindir;
@@ -80,8 +94,8 @@ diff -u --new-file '--exclude=version.h' a/plugin/markad.h b/plugin/markad.h
      char title[80];
      time_t lastcheck;
 diff -u --new-file '--exclude=version.h' a/plugin/setup.h b/plugin/setup.h
---- a/plugin/setup.h	2017-03-13 18:56:14.000000000 +0100
-+++ b/plugin/setup.h	2019-12-02 16:53:58.318943405 +0100
+--- a/plugin/setup.h	2020-01-11 10:19:55.247477749 +0000
++++ b/plugin/setup.h	2020-01-11 12:26:37.607880056 +0000
 @@ -25,6 +25,9 @@
      bool LogoOnly;
      bool DeferredShutdown;
@@ -93,8 +107,8 @@ diff -u --new-file '--exclude=version.h' a/plugin/setup.h b/plugin/setup.h
  };
  
 diff -u --new-file '--exclude=version.h' a/plugin/status.cpp b/plugin/status.cpp
---- a/plugin/status.cpp	2017-03-13 18:56:14.000000000 +0100
-+++ b/plugin/status.cpp	2019-12-02 16:53:58.318943405 +0100
+--- a/plugin/status.cpp	2020-01-11 10:19:55.247477749 +0000
++++ b/plugin/status.cpp	2020-01-11 12:26:37.607880056 +0000
 @@ -72,7 +72,7 @@
  {
      if ((Direct) && (Get(FileName)!=-1)) return false;
@@ -157,9 +171,42 @@ diff -u --new-file '--exclude=version.h' a/plugin/status.cpp b/plugin/status.cpp
          if (errno==ENOENT)
          {
              // no such file or directory -> markad done or crashed
+diff -u --new-file '--exclude=version.h' a/command/Makefile b/command/Makefile
+--- a/command/Makefile	2020-01-11 12:26:37.427878242 +0000
++++ b/command/Makefile	2020-01-11 12:26:37.607880056 +0000
+@@ -21,14 +21,17 @@
+ CXX      ?= g++
+ export CXXFLAGS ?= $(call PKGCFG,cxxflags)
+ export CXXFLAGS ?= -g -rdynamic -O3 -funroll-loops -Wall -Wextra -Woverloaded-virtual -Wno-parentheses
+-export CXXFLAGS += -std=c++11  # to prevent a lot of compiler warnings with Ubuntu 14.04
++CXXVERION=$(shell $(CXX) -dumpversion)
++ifeq ($(CXXVERION),4.8)
++export CXXFLAGS += -std=c++11   # to prevent a lot of compiler warnings with Ubuntu 14.04
++endif
+ #
+ PKG-CONFIG ?= pkg-config
+ STRIP ?= strip
+ 
+ ### Includes and Defines (add further entries here):
+-PKG-LIBS += libavcodec libavutil
+-PKG-INCLUDES += libavcodec libavutil
++PKG-LIBS += libavcodec libavutil libavformat
++PKG-INCLUDES += libavcodec libavutil libavformat
+ 
+ DEFINES += -D_GNU_SOURCE 
+ DEFINES += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
+@@ -44,7 +47,7 @@
+ 
+ ### The object files (add further files here):
+ 
+-OBJS = markad-standalone.o decoder.o marks.o streaminfo.o video.o audio.o demux.o
++OBJS = markad-standalone.o decoder.o marks.o streaminfo.o video.o audio.o demux.o decoder_new.o
+ 
+ ### The main target:
+ 
 diff -u --new-file '--exclude=version.h' a/command/audio.cpp b/command/audio.cpp
---- a/command/audio.cpp	2017-03-13 18:56:14.000000000 +0100
-+++ b/command/audio.cpp	2019-12-02 16:53:58.318943405 +0100
+--- a/command/audio.cpp	2020-01-11 10:19:55.231477591 +0000
++++ b/command/audio.cpp	2020-01-11 12:26:37.607880056 +0000
 @@ -36,7 +36,7 @@
  void cMarkAdAudio::resetmark()
  {
@@ -170,8 +217,8 @@ diff -u --new-file '--exclude=version.h' a/command/audio.cpp b/command/audio.cpp
  
  void cMarkAdAudio::setmark(int type, int position, int channelsbefore, int channelsafter)
 diff -u --new-file '--exclude=version.h' a/command/decoder.cpp b/command/decoder.cpp
---- a/command/decoder.cpp	2019-12-02 16:53:58.306943290 +0100
-+++ b/command/decoder.cpp	2019-12-02 16:53:58.318943405 +0100
+--- a/command/decoder.cpp	2020-01-11 12:26:37.519879170 +0000
++++ b/command/decoder.cpp	2020-01-11 12:26:37.607880056 +0000
 @@ -14,6 +14,8 @@
  #include <cstdlib>
  
@@ -187,9 +234,9 @@ diff -u --new-file '--exclude=version.h' a/command/decoder.cpp b/command/decoder
  }
 +
 diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/decoder_new.cpp
---- a/command/decoder_new.cpp	1970-01-01 01:00:00.000000000 +0100
-+++ b/command/decoder_new.cpp	2019-12-03 20:36:04.745673721 +0100
-@@ -0,0 +1,460 @@
+--- a/command/decoder_new.cpp	1970-01-01 00:00:00.000000000 +0000
++++ b/command/decoder_new.cpp	2020-01-11 12:28:38.837100097 +0000
+@@ -0,0 +1,475 @@
 +#include "decoder_new.h"
 +extern "C"{
 +#include "debug.h"
@@ -212,12 +259,12 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +    if (!recDir) return false;
 +    char *filename;
 +    if (asprintf(&recordingDir,"%s",recDir)==-1) {
-+        esyslog("cDecoder: failed to allocate string, out of memory?");
++        esyslog("cDecoder::DecodeDir(): failed to allocate string, out of memory?");
 +        return false;
 +    }
 +    fileNumber++;
 +    if (asprintf(&filename,"%s/%05i.ts",recDir,fileNumber)==-1) {
-+        esyslog("cDecoder: failed to allocate string, out of memory?");
++        esyslog("cDecoder::DecodeDir(): failed to allocate string, out of memory?");
 +        return false;
 +    }
 +    return this->DecodeFile(filename);
@@ -232,18 +279,18 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +bool cDecoder::DecodeFile(const char * filename) {
 +    if (!filename) return false;
 +    if (avctx) avformat_close_input(&avctx);
-+#if LIBAVCODEC_VERSION_INT < ((58<<16)+(54<<8)+100)
++#if LIBAVCODEC_VERSION_INT < ((58<<16)+(35<<8)+100)
 +    av_register_all();
 +#endif
 +    if (avformat_open_input(&avctx, filename, NULL, NULL) == 0) {
-+        if (msgDecodeFile) isyslog("cDecoder: decode file %s",filename);
++        if (msgDecodeFile) isyslog("cDecoder::DecodeFile(): decode file %s",filename);
 +    }
 +    else {
-+        if (fileNumber <= 1) esyslog("cDecoder: Could not open source file %s", filename);
++        if (fileNumber <= 1) esyslog("cDecoder::DecodeFile(): Could not open source file %s", filename);
 +        return(false);
 +    }
 +    if (avformat_find_stream_info(avctx, NULL) <0) {
-+        esyslog("cDecoder: Could not get stream infos %s", filename);
++        esyslog("cDecoder::DecodeFile(): Could not get stream infos %s", filename);
 +        return(false);
 +    }
 +    for (unsigned int i=0; i<avctx->nb_streams; i++) {
@@ -254,13 +301,13 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +            codec=avcodec_find_decoder(avctx->streams[avpkt.stream_index]->codec->codec_id);
 +#endif
 +            if (!codec) {
-+                esyslog("cDecoder::DecodeFile() could nit find decoder for stream");
++                esyslog("cDecoder::DecodeFile(): could nit find decoder for stream");
 +                return(false);
 +            }
-+            if (msgDecodeFile) isyslog("cDecoder: using decoder %s for stream",codec->long_name);
++            if (msgDecodeFile) isyslog("cDecoder::DecodeFile(): using decoder %s for stream %i",codec->long_name,i);
 +            codecCtx=avcodec_alloc_context3(codec);
 +            if (!codecCtx) {
-+                esyslog("cDecoder::DecodeFile() avcodec_alloc_context3 failed");
++                esyslog("cDecoder::DecodeFile(): avcodec_alloc_context3 failed");
 +                return(false);
 +            }
 +#if LIBAVCODEC_VERSION_INT >= ((57<<16)+(107<<8)+100)
@@ -268,11 +315,11 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +#else
 +            if (avcodec_copy_context(codecCtx,avctx->streams[avpkt.stream_index]->codec) < 0) {
 +#endif
-+                esyslog("cDecoder::DecodeFile() avcodec_parameters_to_context failed");
++                esyslog("cDecoder::DecodeFile(): avcodec_parameters_to_context failed");
 +                return(false);
 +            }
 +            if (avcodec_open2(codecCtx, codec, NULL) < 0) {
-+                esyslog("cDecoder::DecodeFile() avcodec_open2 failed");
++                esyslog("cDecoder::DecodeFile(): avcodec_open2 failed");
 +                return(false);
 +            }
 +            break;
@@ -294,7 +341,7 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +#endif
 +        }
 +    }
-+    esyslog("cDecoder::GetVideoHeight() failed");
++    esyslog("cDecoder::GetVideoHeight(): failed");
 +    return 0;
 +}
 +
@@ -310,7 +357,7 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +#endif
 +        }
 +    }
-+    esyslog("cDecoder::GetVideoWidth() failed");
++    esyslog("cDecoder::GetVideoWidth(): failed");
 +    return 0;
 +}
 +
@@ -326,9 +373,29 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +            return av_q2d(avctx->streams[i]->avg_frame_rate);
 +        }
 +    }
-+    esyslog("cDecoder::GetVideoFramesPerSecond() could not find frame rate");
++    esyslog("cDecoder::GetVideoFramesPerSecond(): could not find average frame rate");
 +    return 0;
 +}
++
++int cDecoder::GetVideoRealFrameRate() {
++    if (!avctx) return 0;
++    for (unsigned int i=0; i<avctx->nb_streams; i++) {
++#if LIBAVCODEC_VERSION_INT >= ((57<<16)+(107<<8)+100)
++        if (avctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
++#else
++        if (avctx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
++#endif
++#if LIBAVCODEC_VERSION_INT >= ((58<<16)+(35<<8)+100)
++            return av_q2d(avctx->streams[i]->r_frame_rate);
++#else
++            return av_q2d(av_stream_get_r_frame_rate(avctx->streams[i]));
++#endif
++        }
++    }
++    esyslog("cDecoder::GetVideoRealFrameRate(): could not find real frame rate");
++    return 0;
++}
++
 +
 +bool cDecoder::GetNextFrame() {
 +    if (!avctx) return false;
@@ -342,7 +409,7 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +       if (avctx->streams[avpkt.stream_index]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
 +#endif
 +             framenumber++;
-+             if (avpkt.flags == AV_PKT_FLAG_KEY) {
++             if (isVideoIFrame()) {
 +                 iFrameCount++;
 +                 if ((iFrameInfoVector.empty()) || (framenumber > iFrameInfoVector.back().iFrameNumber)) {
 +                     if (avpkt.pts != AV_NOPTS_VALUE) {   // store a iframe number pts index
@@ -353,27 +420,27 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +                         newFrameInfo.pts_time_ms=pts_time_ms_LastFile+pts_time_ms;
 +                         iFrameInfoVector.push_back(newFrameInfo);
 +                     }
-+                     else esyslog("cDecoder::GetNextFrame() failed to get pts for iframe %li", framenumber);
++                     else esyslog("cDecoder::GetNextFrame(): failed to get pts for frame %li", framenumber);
 +                 }
 +             }
 +        }
 +        return true;
 +    }
 +    pts_time_ms_LastFile += iFrameInfoVector.back().pts_time_ms;
-+    dsyslog("cDecoder::GetNextFrame() start time next file %li",pts_time_ms_LastFile);
++    dsyslog("cDecoder::GetNextFrame(): start time next file %li",pts_time_ms_LastFile);
 +    return false;
 +}
 +
 +bool cDecoder::SeekToFrame(long int iFrame) {
 +    if (!avctx) return false;
 +    if (framenumber > iFrame) {
-+        dsyslog("cDecoder::SeekToFrame() could not seek backward");
++        dsyslog("cDecoder::SeekToFrame(): could not seek backward");
 +        return false;
 +    }
 +    while (framenumber < iFrame) {
 +        if (!this->GetNextFrame()) 
 +            if (!this->DecodeDir(recordingDir)) {
-+                dsyslog("cDecoder::SeekFrame failed for frame (%li) at frame (%li)", iFrame, framenumber);
++                dsyslog("cDecoder::SeekFrame(): failed for frame (%li) at frame (%li)", iFrame, framenumber);
 +                return false;
 +        }
 +    }
@@ -385,10 +452,10 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +    iFrameData.Valid=false;
 +    if (avFrame) av_frame_free(&avFrame);
 +    if (isVideoStream()) {
-+        if (avpkt.flags == AV_PKT_FLAG_KEY) {
++        if (isVideoIFrame() || stateEAGAIN) {
 +            avFrame=av_frame_alloc();
 +            if (!avFrame) {
-+               esyslog("cDecoder::GetFrameInfo() av_frame_alloc failed");
++               esyslog("cDecoder::GetFrameInfo(): av_frame_alloc failed");
 +               return false;
 +            }
 +#if LIBAVCODEC_VERSION_INT >= ((57<<16)+(107<<8)+100)
@@ -401,7 +468,7 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +#endif
 +            int rc=av_frame_get_buffer(avFrame,32);
 +            if (rc != 0) {
-+                esyslog("cDecoder::GetFrameInfo() av_frame_get_buffer failed rc=%i", rc);
++                esyslog("cDecoder::GetFrameInfo(): av_frame_get_buffer failed rc=%i", rc);
 +                return false;
 +            }
 +
@@ -411,55 +478,49 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +            if (rc  < 0) {
 +                switch (rc) {
 +                    case AVERROR(EAGAIN): 
-+                        dsyslog("DEBUG: cDecoder::GetFrameInfo() avcodec_send_packet error EAGAIN at frame %li", framenumber);
++                        dsyslog("DEBUG: cDecoder::GetFrameInfo(): avcodec_send_packet error EAGAIN at frame %li", framenumber);
 +                        break;
 +                    case AVERROR(ENOMEM): 
-+                        dsyslog("DEBUG: cDecoder::GetFrameInfo() avcodec_send_packet error ENOMEM at frame %li", framenumber);
++                        dsyslog("DEBUG: cDecoder::GetFrameInfo(): avcodec_send_packet error ENOMEM at frame %li", framenumber);
 +                        break;
 +                    case AVERROR(EINVAL): 
-+                        dsyslog("DEBUG: cDecoder::GetFrameInfo() avcodec_send_packet error EINVAL at frame %li", framenumber);
++                        dsyslog("DEBUG: cDecoder::GetFrameInfo(): avcodec_send_packet error EINVAL at frame %li", framenumber);
 +                        break;
 +                    case AVERROR_INVALIDDATA:
-+                        dsyslog("DEBUG: cDecoder::GetFrameInfo() avcodec_send_packet error AVERROR_INVALIDDATA at frame %li", framenumber); // this could happen on the start of a recording
++                        dsyslog("DEBUG: cDecoder::GetFrameInfo(): avcodec_send_packet error AVERROR_INVALIDDATA at frame %li", framenumber); // this could happen on the start of a recording
 +                        break;
 +                    default: 
-+                        dsyslog("DEBUG: cDecoder::GetFrameInfo() avcodec_send_packet failed with rc=%i at frame %li",rc,framenumber);
++                        dsyslog("DEBUG: cDecoder::GetFrameInfo(): avcodec_send_packet failed with rc=%i at frame %li",rc,framenumber);
 +                        break;
 +                }
 +                return false;
 +            }
-+//            rc=avcodec_send_packet(codecCtx,NULL);    // force immediate decoding
-+//            if (rc  < 0) {
-+//                esyslog("cDecoder::GetFrameInfo() avcodec_send_packet NULL failed with rc=%i at frame %li",rc,framenumber);
-+//                return false;
-+//            }
-+
 +            rc = avcodec_receive_frame(codecCtx,avFrame);
 +            if (rc < 0) {
 +                switch (rc) {
 +                    case AVERROR(EAGAIN): 
-+                        dsyslog("DEBUG: cDecoder::GetFrameInfo() avcodec_receive_frame error EAGAIN at frame %li", framenumber); 
++                        tsyslog("TRACE: cDecoder::GetFrameInfo(): avcodec_receive_frame error EAGAIN at frame %li", framenumber); 
++                        stateEAGAIN=true;
 +                        break;
 +                    case AVERROR(EINVAL): 
-+                        dsyslog("DEBUG cDecoder::GetFrameInfo() avcodec_receive_frame error EINVAL at frame %li", framenumber);
++                        dsyslog("DEBUG: cDecoder::GetFrameInfo(): avcodec_receive_frame error EINVAL at frame %li", framenumber);
 +                        break;
 +                    default: 
-+                        dsyslog("DEBUG: cDecoder::GetFrameInfo() avcodec_receive_frame: decode of frame (%li) failed with return code %i", framenumber, rc);
++                        dsyslog("DEBUG: cDecoder::GetFrameInfo(): avcodec_receive_frame: decode of frame (%li) failed with return code %i", framenumber, rc);
 +                        break;
 +                }
-+//               avcodec_flush_buffers(codecCtx);       // Reset the internal decoder state
 +                return false;
 +            }
-+//            avcodec_flush_buffers(codecCtx);       // Reset the internal decoder state
 +#else
-+            int rc=0;
 +            int video_frame_ready=0;
 +            rc=avcodec_decode_video2(codecCtx,avFrame,&video_frame_ready,&avpkt);
 +            if (rc < 0) {
-+                esyslog("cDecoder::GetFrameInfo() avcodec_decode_video2 decode of frame (%li) failed with return code %i", framenumber, rc);
++                esyslog("cDecoder::GetFrameInfo(): avcodec_decode_video2 decode of frame (%li) failed with return code %i", framenumber, rc);
 +                return false;
 +            }
 +#endif
++            stateEAGAIN=false;
++
 +            if (avFrame->interlaced_frame != interlaced_frame) {
 +                isyslog("found %s video format",(avFrame->interlaced_frame) ? "interlaced" : "non interlaced");
 +                interlaced_frame=avFrame->interlaced_frame;
@@ -475,7 +536,7 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +            int sample_aspect_ratio_num = avFrame->sample_aspect_ratio.num;
 +            int sample_aspect_ratio_den = avFrame->sample_aspect_ratio.den;
 +            if ((sample_aspect_ratio_num == 0) || (sample_aspect_ratio_den == 0)) {
-+                    esyslog("cDecoder::GetFrameInfo() invalid aspect ratio (%i:%i) at iframe (%li)", sample_aspect_ratio_num, sample_aspect_ratio_den, framenumber);
++                    esyslog("cDecoder::GetFrameInfo(): invalid aspect ratio (%i:%i) at frame (%li)", sample_aspect_ratio_num, sample_aspect_ratio_den, framenumber);
 +                    return false;
 +            }
 +            if ((sample_aspect_ratio_num == 1) && (sample_aspect_ratio_den == 1)) {
@@ -485,7 +546,7 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +                    sample_aspect_ratio_den = 9;
 +                }
 +                else {
-+                    esyslog("cDecoder::GetFrameInfo() unknown aspect ratio to video width %i hight %i at frame %li)", avFrame->width, avFrame->height, framenumber);
++                    esyslog("cDecoder::GetFrameInfo(): unknown aspect ratio to video width %i hight %i at frame %li)", avFrame->width, avFrame->height, framenumber);
 +                    return false;
 +                }
 +            }
@@ -506,12 +567,12 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +//                                   sample_aspect_ratio_num =4;
 +//                                   sample_aspect_ratio_den =3;
 +                               }
-+                          else esyslog("cDecoder::GetFrameInfo() unknown aspect ratio (%i:%i) at iframe (%li)", 
++                          else esyslog("cDecoder::GetFrameInfo(): unknown aspect ratio (%i:%i) at frame (%li)", 
 +                                                                               sample_aspect_ratio_num, sample_aspect_ratio_den, framenumber);
 +            }
 +            if ((maContext->Video.Info.AspectRatio.Num != sample_aspect_ratio_num) ||
 +               ( maContext->Video.Info.AspectRatio.Den != sample_aspect_ratio_den)) {
-+                if (msgGetFrameInfo) dsyslog("cDecoder::GetFrameInfo() aspect ratio changed from (%i:%i) to (%i:%i) at iframe %li",
++                if (msgGetFrameInfo) dsyslog("cDecoder::GetFrameInfo(): aspect ratio changed from (%i:%i) to (%i:%i) at frame %li",
 +                                                                                                        maContext->Video.Info.AspectRatio.Num, 
 +                                                                                                        maContext->Video.Info.AspectRatio.Den, 
 +                                                                                                        sample_aspect_ratio_num, 
@@ -520,28 +581,29 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +                maContext->Video.Info.AspectRatio.Num=sample_aspect_ratio_num;
 +                maContext->Video.Info.AspectRatio.Den=sample_aspect_ratio_den;
 +            }
-+
++            return true;
 +        }
-+        return true;
++        return false;
 +    }
 +
 +    if (isAudioStream()) {
 +        if (isAudioAC3Frame()) {
 +#if LIBAVCODEC_VERSION_INT >= ((57<<16)+(107<<8)+100)
 +            if (maContext->Audio.Info.Channels != avctx->streams[avpkt.stream_index]->codecpar->channels) {
-+                dsyslog("cDecoder::GetFrameInfo() audio channels changed from %i to %i at frame (%li)", maContext->Audio.Info.Channels, 
++                dsyslog("cDecoder::GetFrameInfo(): audio channels changed from %i to %i at frame (%li)", maContext->Audio.Info.Channels, 
 +                                                                                                        avctx->streams[avpkt.stream_index]->codecpar->channels, 
 +                                                                                                        framenumber);
 +                maContext->Audio.Info.Channels = avctx->streams[avpkt.stream_index]->codecpar->channels;
 +#else
 +            if (maContext->Audio.Info.Channels != avctx->streams[avpkt.stream_index]->codec->channels) {
-+                dsyslog("cDecoder::GetFrameInfo() audio channels changed from %i to %i at frame (%li)", maContext->Audio.Info.Channels, 
++                dsyslog("cDecoder::GetFrameInfo(): audio channels changed from %i to %i at frame (%li)", maContext->Audio.Info.Channels, 
 +                                                                                                        avctx->streams[avpkt.stream_index]->codec->channels, 
 +                                                                                                        framenumber);
 +                maContext->Audio.Info.Channels = avctx->streams[avpkt.stream_index]->codec->channels;
 +#endif
 +            }
 +        }
++        return true;
 +    }
 +    return false;
 +}
@@ -580,7 +642,7 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +bool cDecoder::isVideoIFrame() {
 +    if (!avctx) return false;
 +    if (!isVideoStream()) return false;
-+        if (avpkt.flags == AV_PKT_FLAG_KEY) return true;
++    if ((avpkt.flags & AV_PKT_FLAG_KEY) != 0)  return true;
 +    return false;
 +}
 +
@@ -606,7 +668,7 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +            if (iInfo->iFrameNumber >= endFrame) return counter;
 +        }
 +    }
-+    dsyslog("cDecoder::GetIFrameCount() failed beginFrame (%li) endFrame (%li) last frame in index list (%li)", beginFrame, endFrame, iFrameInfoVector.back().iFrameNumber);
++    dsyslog("cDecoder::GetIFrameCount(): failed beginFrame (%li) endFrame (%li) last frame in index list (%li)", beginFrame, endFrame, iFrameInfoVector.back().iFrameNumber);
 +    return(0);
 +}
 +
@@ -618,7 +680,7 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +        }
 +        else before_iFrame=iInfo->iFrameNumber;
 +    }
-+    dsyslog("cDecoder::GetNearestIFrame() failed for frame (%li)", iFrame);
++    dsyslog("cDecoder::GetNearestIFrame(): failed for frame (%li)", iFrame);
 +    return 0;
 +}
 +
@@ -626,19 +688,19 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +long int cDecoder::GetTimeFromIFrame(long int iFrame) {
 +    long int before_pts=0;
 +    long int before_iFrame=0;
-+    if (iFrameInfoVector.empty()) esyslog("cDecoder::GetTimeFromIFrame() iFrame Index not initialized");
++    if (iFrameInfoVector.empty()) esyslog("cDecoder::GetTimeFromIFrame(): iFrame Index not initialized");
 +    for (std::vector<iFrameInfo>::iterator iInfo = iFrameInfoVector.begin(); iInfo != iFrameInfoVector.end(); ++iInfo) {
 +        if (iFrame == iInfo->iFrameNumber) {
-+            dsyslog("cDecoder: iFrame (%li) time is %lims", iFrame, iInfo->pts_time_ms);
++            dsyslog("cDecoder::GetTimeFromIFrame(): iFrame (%li) time is %lims", iFrame, iInfo->pts_time_ms);
 +            return iInfo->pts_time_ms;
 +        }
 +        if (iInfo->iFrameNumber > iFrame) {
 +            if (abs(iFrame - before_iFrame) < abs(iFrame - iInfo->iFrameNumber)) {
-+                esyslog("cDecoder: frame (%li) is not an iFrame, returning time from iFrame before (%li) %lims",iFrame,before_iFrame,before_pts);
++                esyslog("cDecoder::GetTimeFromIFrame(): frame (%li) is not an iFrame, returning time from iFrame before (%li) %lims",iFrame,before_iFrame,before_pts);
 +                return before_pts;
 +            }
 +            else {
-+                esyslog("cDecoder: frame (%li) is not an iFrame, returning time from iFrame after (%li) %lims",iFrame,iInfo->iFrameNumber,iInfo->pts_time_ms);
++                dsyslog("cDecoder::GetTimeFromIFrame(): frame (%li) is not an iFrame, returning time from iFrame after (%li) %lims",iFrame,iInfo->iFrameNumber,iInfo->pts_time_ms);
 +                return iInfo->pts_time_ms;
 +            }
 +        }
@@ -647,13 +709,13 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.cpp b/command/dec
 +            before_pts=iInfo->pts_time_ms;
 +        }
 +    }
-+    esyslog("cDecoder: could not find time for frame %li",iFrame);
++    esyslog("cDecoder::GetTimeFromIFrame(): could not find time for frame %li",iFrame);
 +    return 0;
 +}
 diff -u --new-file '--exclude=version.h' a/command/decoder_new.h b/command/decoder_new.h
---- a/command/decoder_new.h	1970-01-01 01:00:00.000000000 +0100
-+++ b/command/decoder_new.h	2019-12-03 20:36:21.893878188 +0100
-@@ -0,0 +1,62 @@
+--- a/command/decoder_new.h	1970-01-01 00:00:00.000000000 +0000
++++ b/command/decoder_new.h	2020-01-11 12:27:40.788516180 +0000
+@@ -0,0 +1,67 @@
 +#include <vector>
 +#include "global.h"
 +
@@ -663,6 +725,9 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.h b/command/decod
 +#include <libavformat/avio.h>
 +#include <libavutil/file.h>
 +}
++
++#define CDECODERVERSION 59
++#define MAXEAGAINERRORS 10
 +
 +class cDecoder
 +{
@@ -675,6 +740,7 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.h b/command/decod
 +        int GetVideoHeight();
 +        int GetVideoWidth();
 +        int GetVideoFramesPerSecond();
++	int GetVideoRealFrameRate();
 +        bool GetNextFrame();
 +	bool SeekToFrame(long int iFrame);
 +        bool GetFrameInfo(MarkAdContext *maContext);
@@ -715,10 +781,11 @@ diff -u --new-file '--exclude=version.h' a/command/decoder_new.h b/command/decod
 +	bool msgDecodeFile=true;
 +	bool msgGetFrameInfo=true;
 +	int interlaced_frame=-1;
++	bool stateEAGAIN=false;
 +};
 diff -u --new-file '--exclude=version.h' a/command/demux.cpp b/command/demux.cpp
---- a/command/demux.cpp	2017-03-13 18:56:14.000000000 +0100
-+++ b/command/demux.cpp	2019-12-02 16:53:58.318943405 +0100
+--- a/command/demux.cpp	2020-01-11 10:19:55.231477591 +0000
++++ b/command/demux.cpp	2020-01-11 12:26:37.607880056 +0000
 @@ -648,6 +648,7 @@
                  esyslog("sequence error %i->%i (0x%04x)",counter,tshdr->Counter,pid);
              }
@@ -728,8 +795,8 @@ diff -u --new-file '--exclude=version.h' a/command/demux.cpp b/command/demux.cpp
              if (!tshdr->PayloadStart)
              {
 diff -u --new-file '--exclude=version.h' a/command/global.h b/command/global.h
---- a/command/global.h	2017-03-13 18:56:14.000000000 +0100
-+++ b/command/global.h	2019-12-03 20:33:58.132155910 +0100
+--- a/command/global.h	2020-01-11 10:19:55.231477591 +0000
++++ b/command/global.h	2020-01-11 12:26:37.607880056 +0000
 @@ -29,25 +29,29 @@
  #define MT_ASSUMEDSTART   (unsigned char) 0x11
  #define MT_ASSUMEDSTOP    (unsigned char) 0x12
@@ -845,32 +912,9 @@ diff -u --new-file '--exclude=version.h' a/command/global.h b/command/global.h
          } Info;
  
          struct Data
-diff -u --new-file '--exclude=version.h' a/command/Makefile b/command/Makefile
---- a/command/Makefile	2019-12-02 16:53:58.298943213 +0100
-+++ b/command/Makefile	2019-12-02 16:53:58.318943405 +0100
-@@ -27,8 +27,8 @@
- STRIP ?= strip
- 
- ### Includes and Defines (add further entries here):
--PKG-LIBS += libavcodec libavutil
--PKG-INCLUDES += libavcodec libavutil
-+PKG-LIBS += libavcodec libavutil libavformat
-+PKG-INCLUDES += libavcodec libavutil libavformat
- 
- DEFINES += -D_GNU_SOURCE 
- DEFINES += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
-@@ -44,7 +44,7 @@
- 
- ### The object files (add further files here):
- 
--OBJS = markad-standalone.o decoder.o marks.o streaminfo.o video.o audio.o demux.o
-+OBJS = markad-standalone.o decoder.o marks.o streaminfo.o video.o audio.o demux.o decoder_new.o
- 
- ### The main target:
- 
 diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/command/markad-standalone.cpp
---- a/command/markad-standalone.cpp	2019-12-02 16:53:58.000000000 +0100
-+++ b/command/markad-standalone.cpp	2019-12-03 22:34:41.356767311 +0100
+--- a/command/markad-standalone.cpp	2020-01-11 12:26:37.339877356 +0000
++++ b/command/markad-standalone.cpp	2020-01-11 12:26:37.607880056 +0000
 @@ -36,6 +36,7 @@
  
  bool SYSLOG=false;
@@ -888,7 +932,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
          char fmt[255];
          snprintf(fmt, sizeof(fmt), "%s%s [%d] %s", LOG2REC ? "":"markad: ",buf, getpid(), format);
          va_start(ap, format);
-@@ -233,37 +234,84 @@
+@@ -233,41 +234,112 @@
      if (!startframe) return;
      if (!macontext.Video.Info.FramesPerSecond) return;
  
@@ -907,12 +951,10 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
 -    chkSTOP=-iStop+(3*delta);
 +    iStop = -(startframe + macontext.Video.Info.FramesPerSecond * length) ;
 +
-+//    iStartA=abs(iStart) + macontext.Video.Info.FramesPerSecond * 30;  // try to skip the start ad
 +    iStartA=abs(iStart);
 +    iStopA =startframe + macontext.Video.Info.FramesPerSecond * (length + macontext.Config->astopoffs - 30);
 +    chkSTOP=startframe + macontext.Video.Info.FramesPerSecond * (length + macontext.Config->posttimer);
-+
-+    chkSTART=abs(iStart) + macontext.Video.Info.FramesPerSecond * 4*MAXRANGE;  
++    chkSTART=abs(iStart) + macontext.Video.Info.FramesPerSecond * 3*MAXRANGE;  
 +
 +    dsyslog("assumed start frame %i", iStartA);
 +    dsyslog("assumed stop frame %i", iStopA);
@@ -924,41 +966,73 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
  {
 -    dsyslog("checking stop");
 +    dsyslog("checking stop (%i)", lastiframe);
++
++    clMark *mark=marks.GetFirst();
++    while (mark) {
++        dsyslog("mark at position %i type 0x%X", mark->position, mark->type);
++        mark=mark->Next();
++    }
++
+     int delta=macontext.Video.Info.FramesPerSecond*MAXRANGE;
+-    clMark *end=marks.GetAround(delta,iStop,MT_STOP,0x0F);
 +    if (ignoreHborder) {
++        dsyslog("delete all border marks");
 +        marks.Del(MT_HBORDERSTART);
 +        marks.Del(MT_HBORDERSTOP);
 +    }
-     int delta=macontext.Video.Info.FramesPerSecond*MAXRANGE;
--    clMark *end=marks.GetAround(delta,iStop,MT_STOP,0x0F);
-+    clMark *end=marks.GetAround(3*delta,iStopA,MT_ASPECTSTOP);      // try if we can get a good stop mark
++    clMark *end=marks.GetAround(3*delta,iStopA,MT_CHANNELSTOP);      // try if we can get a good stop mark, start with MT_ASPECTSTOP
 +    if (!end) {
-+        dsyslog("no MT_ASPECTSTOP mark found");
-+        end=marks.GetAround(INT_MAX,iStopA,MT_STOP,0x0F);    // try any type of stop mark
++        dsyslog("no MT_CHANNELSTOP mark found");
++        end=marks.GetAround(3*delta,iStopA,MT_ASPECTSTOP);      // try MT_ASPECTSTOP
++        if (!end) {
++            dsyslog("no MT_ASPECTSTOP mark found");
++            end=marks.GetAround(3*delta,iStopA,MT_HBORDERSTOP);         // try MT_HBORDERSTOP
++            if (!end) {
++                dsyslog("no MT_HBORDERSTOP mark found");
++                end=marks.GetAround(delta,iStopA,MT_LOGOSTOP);        // try MT_LOGOSTOP
++                if (!end) {
++                    dsyslog("no MT_LOGOSTOP mark found");
++                    end=marks.GetAround(3*delta,iStopA,MT_STOP,0x0F);    // try any type of stop mark
++                }
++                else dsyslog("MT_LOGOSTOP found at frame %i", end->position);
++            }
++            else dsyslog("MT_HBORDERSTOP found at frame %i", end->position);
++        }
++        else dsyslog("MT_ASPECTSTOP found at frame %i", end->position);
 +    }
-+    else dsyslog("MT_ASPECTSTOP found at frame %i", end->position);
-+    clMark *lastStart=marks.GetAround(INT_MAX,lastiframe,MT_START,0x0F);  
++    else dsyslog("MT_CHANNELSTOP found at frame %i", end->position);
  
++    clMark *lastStart=marks.GetAround(INT_MAX,lastiframe,MT_START,0x0F);  
      if (end)
 -    {
 -        marks.DelTill(end->position,false);
--        isyslog("using mark on position %i as stop mark",end->position);
 +    { 
 +        dsyslog("found end mark at (%i)", end->position);
-+        if (end->type == MT_NOBLACKSTOP) {        // this is a week mark, try another type of stop mark before
-+            clMark *end2=marks.GetAround(delta,iStopA-delta,MT_STOP,0x0F);
-+            if ((end2) && (end2->type != MT_NOBLACKSTOP) && (end2->position >= iStopA - 3*delta)) {
-+                dsyslog("stop mark is week, use stronger stop mark at (%i)", end2->position);
-+                end=end2;
++        clMark *mark=marks.GetFirst();
++        while (mark) {
++            if ((mark->position >= iStopA-macontext.Video.Info.FramesPerSecond*MAXRANGE) &&   // there could be a valid black screen start mark
++                              (mark->position < end->position) && 
++                              (mark->type < (end->type & 0xF0))) {  // do not delete a start mark of the sane type
++                dsyslog("found stronger mark delete mark (%i)", mark->position);
++                clMark *tmp=mark;
++                mark=mark->Next();
++                marks.Del(tmp);
++                continue;
 +            }
-+            else {     // try next stop mark, better save than sorry
-+                clMark *end3=marks.GetAround(2*delta,end2->position+2*delta,MT_STOP,0x0F);
-+                if (end3) {
-+                    dsyslog("stop mark is week, use next stop mark at (%i)", end3->position);
-+                    end=end3;
-+                }
-+            }
-+
++            mark=mark->Next();
 +        }
++
++        if ((end->type == MT_NOBLACKSTOP) && (end->position < iStopA)) {        // if stop mark is MT_NOBLACKSTOP and it is not after iStopA try next, better save than sorry 
++           clMark *end2=marks.GetAround(delta,end->position+2*delta,MT_STOP,0x0F);
++           if (end2) {
++               dsyslog("stop mark is week, use next stop mark at (%i)", end2->position);
++               end=end2;
++           }
++        }
++
+         isyslog("using mark on position %i as stop mark",end->position);
++        marks.DelTill(end->position,false);
++
 +        if ( end->position < iStopA - 3*delta ) {    // last found stop mark to early, adding STOP mark at the end
 +                                                     // this can happen by audio channel change too if the next broadcast has also 6 channels
 +            if ( ( lastStart) && ( lastStart->position > end->position ) ) {
@@ -968,34 +1042,43 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
 +                mark.Type=MT_ASSUMEDSTOP;
 +                AddMark(&mark);
 +            }
-+            else {
-+                marks.DelTill(end->position,false);
-+                isyslog("using mark on position %i as stop mark",end->position);
-+            }
-+        }
-+        else {
-+            marks.DelTill(end->position,false);
-+            isyslog("using mark on position %i as stop mark",end->position);
 +        }
      }
      else
      {
-+        dsyslog("no STOP mark found");
++        dsyslog("no stop mark found");
          //fallback
          if (iStopinBroadCast)
          {
 -            MarkAdMark mark;
 -            memset(&mark,0,sizeof(mark));
+-            mark.Position=iStopA;
++            dsyslog("add stop mark at %i",iStopA+delta);
 +            MarkAdMark mark={};
-             mark.Position=iStopA;
++            mark.Position=iStopA+delta;
              mark.Type=MT_ASSUMEDSTOP;
              AddMark(&mark);
-@@ -281,8 +329,11 @@
+-            marks.DelTill(iStopA,false);
++            marks.DelTill(iStopA+delta,false);
+         }
+         else
+         {
+@@ -281,8 +353,21 @@
  
  void cMarkAdStandalone::CheckStart()
  {
 -    dsyslog("checking start");
 +    dsyslog("checking start (%i)", lastiframe);
++
++//  only for debugging
++    clMark *mark=marks.GetFirst();
++    while (mark) {
++        dsyslog("mark at position %i type 0x%X", mark->position, mark->type);
++        mark=mark->Next();
++    }
++
++    marks.DelTill(1);    // delete initial mark at position 0, this is from the previous recordding
++
      clMark *begin=NULL;
 +    int delta=macontext.Video.Info.FramesPerSecond*MAXRANGE;
 +
@@ -1003,7 +1086,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
  
      if ((macontext.Info.Channels) && (macontext.Audio.Info.Channels) &&
              (macontext.Info.Channels!=macontext.Audio.Info.Channels))
-@@ -332,8 +383,19 @@
+@@ -332,8 +417,19 @@
              macontext.Video.Options.IgnoreLogoDetection=true;
              marks.Del(MT_ASPECTSTART);
              marks.Del(MT_ASPECTSTOP);
@@ -1011,9 +1094,9 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
 -            begin=marks.GetAround(INT_MAX,iStart,MT_CHANNELSTART);
 +            // start mark must be around iStartA
 +            begin=marks.GetAround(INT_MAX,iStartA,MT_CHANNELSTART);
-+            if (!begin) {
-+                dsyslog("no audio channel start mark found, try horizontal border as start mark");
-+                begin=marks.GetAround(INT_MAX,iStartA,MT_HBORDERSTART);
++            if (!begin) {          // previous recording had also 6 channels, try other marks
++                dsyslog("no audio channel start mark found, try horizontal border as start mark"); 
++                begin=marks.GetAround(iStartA,iStartA+1,MT_HBORDERSTART);  // ignore the start frame border, it is from the previous recording
 +                if (begin) {
 +                    dsyslog("found horizontal border and add this as assumed start (%i)",begin->position);
 +                    MarkAdMark mark={};
@@ -1025,7 +1108,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
          }
          else
          {
-@@ -384,8 +446,8 @@
+@@ -384,8 +480,28 @@
              macontext.Video.Options.IgnoreLogoDetection=true;
              marks.Del(MT_CHANNELSTART);
              marks.Del(MT_CHANNELSTOP);
@@ -1033,52 +1116,109 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
 -            begin=marks.GetAround(macontext.Video.Info.FramesPerSecond*(MAXRANGE*4),iStart,MT_ASPECTSTART);
 +            // start mark must be around iStartA
 +            begin=marks.GetAround(macontext.Video.Info.FramesPerSecond*(MAXRANGE*4),iStartA,MT_ASPECTSTART);
++            if (begin) {
++	        dsyslog("MT_ASPECTSTART found at (%i)",begin->position);
++	        if (begin->position < abs(iStartA)/4) {    // this is not a valid start, try if there is better start mark
++                    clMark *begin2=marks.GetAround(iStartA,iStartA+delta,MT_START,0x0F);
++                    if (begin2) {
++                        begin2->type=MT_ASSUMEDSTART;  // most types of marks will be deleted if we do aspect ratio detecetion
++                        dsyslog("changing start position from (%i) to next start mark (%i)", begin->position, begin2->position);
++                        begin=begin2;
++                    }
++                }
++	    }
++            else {
++                dsyslog("no MT_ASPECTSTART found");   // previous is 4:3 too, try another start mark
++                clMark *begin2=marks.GetAround(iStartA,iStartA+delta,MT_START,0x0F);
++                if (begin2) {
++                    begin2->type=MT_ASSUMEDSTART;  // most types of marks will be deleted if we do aspect ratio detecetion
++                    dsyslog("using mark at position (%i) as start mark", begin2->position);
++                    begin=begin2;
++                }
++           }
          }
      }
  
-@@ -399,11 +461,29 @@
+@@ -399,14 +515,55 @@
          marks.Del(MT_VBORDERSTART);
          marks.Del(MT_VBORDERSTOP);
      }
-+    else {
-+        clMark *bStart=marks.GetAround(iStartA,iStartA,MT_HBORDERSTART);    
++    if (!begin) {    // try horizontal border
++        clMark *bStart=marks.GetAround(iStartA+delta,iStartA+delta,MT_HBORDERSTART);    
 +        if (!bStart) {   
 +            dsyslog("no horizontal border at start found, ignore horizontal border detection");
 +            ignoreHborder=true;
 +        }
 +        else {
 +            dsyslog("horizontal border start found at (%i)", bStart->position);
-+            clMark *bStop=marks.GetAround(iStartA,iStartA,MT_HBORDERSTOP);    
++            clMark *bStop=marks.GetAround(delta,bStart->position,MT_HBORDERSTOP);    
 +            if ( (bStop) && (bStop->position > bStart->position)) {
 +                isyslog("horizontal border STOP (%i) after horizontal border START (%i) found, this is the end of the previous recording, delete marks",bStop->position,bStart->position);
-+                    marks.Del(bStart);
-+                    marks.Del(bStop);
++                marks.Del(bStart);
++                marks.Del(bStop);
 +
 +            }
++            else {
++                begin=bStart;   // found valid horizontal border start mark
++            }
 +        }
-+   }
++    }
  
-     if (!begin)
+-    if (!begin)
++     if (!begin) {   // try logo start mark
++        clMark *lStart=marks.GetAround(iStartA+delta,iStartA+delta,MT_LOGOSTART);
++        if (!lStart) {
++            dsyslog("no logo start mark found");
++        }
++        else {
++            dsyslog("logo start mark found at (%i)", lStart->position);
++            clMark *lStop=marks.GetAround(delta,lStart->position,MT_LOGOSTOP);
++            if ( (lStop) && (lStop->position > lStart->position)) {
++                isyslog("logo STOP (%i) after logo START (%i) found, this is the end of the previous recording, delete marks",lStop->position,lStart->position);
++                marks.Del(lStart);
++                marks.Del(lStop);
++
++            }
++            else {
++                begin=lStart;   // found valid logo start mark
++            }
++        }
++    }
++
++    if (!begin)    // try anything
      {
 -        begin=marks.GetAround(macontext.Video.Info.FramesPerSecond*(MAXRANGE*2),iStart,MT_START,0x0F);
-+        begin=marks.GetAround(iStartA,iStartA,MT_START,0x0F);
++        begin=marks.GetAround(iStartA+delta,iStartA,MT_START,0x0F);
          if (begin) {
 +            dsyslog("found start mark at (%i)", begin->position);
              clMark *begin2=marks.GetAround(macontext.Video.Info.FramesPerSecond*MAXRANGE,begin->position,MT_START,0x0F);
              if (begin2) {
-                 if (begin2->type>begin->type) {
-@@ -420,29 +500,84 @@
-                     }
-                 }
-             }
-+            if (begin->type == MT_NOBLACKSTART) {  // this is weak, check if there is a better logo mark
-+                clMark *begin3=marks.GetAround(iStartA,iStartA,MT_LOGOSTART);
-+                if (begin3) {
-+                    if (begin3->position > 0) {
-+                        isyslog("mark on position %i stronger than mark on position %i as start mark",begin3->position,begin->position);
-+                        begin=begin3;
+-                if (begin2->type>begin->type) {
++                if (begin2->type > begin->type) {
+                     if (begin2->type==MT_ASPECTSTART) {
+                         // special case, only take this mark if aspectratio is 4:3
+                         if ((macontext.Video.Info.AspectRatio.Num==4) &&
+@@ -415,34 +572,91 @@
+                             begin=begin2;
+                         }
+                     } else {
+-                        isyslog("mark on position %i stronger than mark on position %i as start mark",begin2->position,begin->position);
+-                        begin=begin2;
++                        if (begin2->position > iStartA/4) {
++                            isyslog("mark on position (%i) stronger than mark on position (%i) as start mark",begin2->position,begin->position);
++                            begin=begin2;
++                        }
 +                    }
 +                }
++            }
++            if (begin->type == MT_NOBLACKSTART) {  // this is weak, check if there is a better logo mark
++                clMark *begin3=marks.GetAround(iStartA+delta,iStartA+delta,MT_LOGOSTART);
++                if (begin3) {
++                    if (begin3->position > iStartA/4) {
++                        isyslog("mark on position (%i) stronger than mark on position (%i) as start mark",begin3->position,begin->position);
++                        begin=begin3;
+                     }
+                 }
 +                else {    // if there is no logo start mark and we do not use logo detection after start, use blackscreen mark only if it is not to late
 +                   if (!bDecodeVideo && (begin->position > (iStartA + macontext.Video.Info.FramesPerSecond*2*MAXRANGE))) { // we are lost, use startframe as start mark
 +                       dsyslog("start of black screen to late (%i) setting start to startframe (%i)", begin->position, iStart);
@@ -1092,13 +1232,13 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
 +                   }
 +                }
 +            }
-+            if ((begin->type == MT_LOGOSTART) && (begin->position < abs(iStart)/4)) {    // this is not a valid start, try next start mark
++            if ((begin->type == MT_LOGOSTART) && (begin->position < iStartA/4)) {    // this is not a valid start, try next start mark
 +                clMark *begin4=marks.GetAround(iStartA,iStartA+delta,MT_START,0x0F);
 +                if (begin4) {
 +                    dsyslog("changing start position from (%i) to next start mark (%i)", begin->position, begin4->position);
 +                    begin=begin4;
 +                }
-+            }
+             }
          }
      }
      if (begin)
@@ -1157,24 +1297,48 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
          mark.Position=iStart;
          mark.Type=MT_ASSUMEDSTART;
          AddMark(&mark);
-@@ -452,19 +587,50 @@
+@@ -452,19 +666,71 @@
      return;
  }
  
 -void cMarkAdStandalone::CheckLogoMarks()
 +void cMarkAdStandalone::CheckLogoMarks()            // cleanup marks that make no sense
  {
++    isyslog("cleanup marks");
      clMark *mark=marks.GetFirst();
-     while (mark)
-     {
+-    while (mark)
+-    {
++    while (mark) {
++        
++        if (((mark->type & 0x0F)==MT_START) && (mark->Next()) && ((mark->Next()->type & 0x0F)==MT_START)) {  // two start marks, delete second
++            dsyslog("start mark (%i) folowed by start mark (%i) delete second", mark->position, mark->Next()->position);
++            marks.Del(mark->Next());
++            continue;
++        }
++        if (((mark->type & 0x0F)==MT_STOP) && (mark->Next()) && ((mark->Next()->type & 0x0F)==MT_STOP)) {  // two stop marks, delete second
++            dsyslog("stop mark (%i) folowed by stop mark (%i) delete first", mark->position, mark->Next()->position);
++            clMark *tmp=mark;
++            mark=mark->Next();
++            marks.Del(tmp);
++            continue;
++        }
 +
-+        if ((mark->type==MT_NOBLACKSTOP) && mark->Next() && mark->Next()->type==MT_NOBLACKSTART)
-+        {
++        if ((mark->type==MT_NOBLACKSTOP) && mark->Next() && (mark->Next()->type==MT_NOBLACKSTART)) {
 +            int MARKDIFF=(int) (macontext.Video.Info.FramesPerSecond*4);
-+            if (abs(mark->Next()->position-mark->position)<=MARKDIFF)
-+            {
++            if (abs(mark->Next()->position-mark->position)<=MARKDIFF) {
 +                double distance=(mark->Next()->position-mark->position)/macontext.Video.Info.FramesPerSecond;
 +                isyslog("mark distance between STOP and START too short (%.1fs), deleting %i,%i", distance, mark->position, mark->Next()->position);
++                clMark *tmp=mark;
++                mark=mark->Next()->Next();
++                marks.Del(tmp->Next());
++                marks.Del(tmp);
++                continue;
++            }
++        }
++
++        if ((mark->type==MT_NOBLACKSTOP) && mark->Next() && (mark->Next()->type==MT_NOBLACKSTART)) {
++            if ((mark->Next()->position>iStopA-macontext.Video.Info.FramesPerSecond*MAXRANGE) && (mark->position>iStopA-macontext.Video.Info.FramesPerSecond*MAXRANGE)) {
++                isyslog("blackscreen start mark followed by blackscreen stop mark, deleting %i,%i", mark->position, mark->Next()->position);
 +                clMark *tmp=mark;
 +                mark=mark->Next()->Next();
 +                marks.Del(tmp->Next());
@@ -1192,9 +1356,8 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
 +                isyslog("mark distance between START and STOP too short (%.1fs), deleting %i,%i", distance, mark->position, mark->Next()->position);
 +                clMark *tmp=mark;
 +                mark=mark->Next()->Next();
-+                if (tmp->Next()->Next()) marks.Del(tmp->Next());    // do not delete stop mark
-+                if (marks.GetFirst()->position != tmp->position) marks.Del(tmp);      // do not delete start mark
-+		else mark=mark->Prev();
++                marks.Del(tmp->Next());
++                if (marks.GetFirst()->position!=tmp->position) marks.Del(tmp);  // do not delete start mark
 +                continue;
 +            }
 +        }
@@ -1212,28 +1375,21 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
                  clMark *tmp=mark;
                  mark=mark->Next()->Next();
                  marks.Del(tmp->Next());
-@@ -472,6 +638,20 @@
+@@ -472,6 +738,13 @@
                  continue;
              }
          }
 +
-+        if (((mark->type & 0x0F)==MT_START) && (mark->Next()) && ((mark->Next()->type & 0x0F)==MT_START)) {  // two start marks, delete second
-+            dsyslog("start mark (%i) folowed by start mark (%i) delete second", mark->position, mark->Next()->position);
-+            marks.Del(mark->Next());
-+        }
-+        if (((mark->type & 0x0F)==MT_STOP) && (mark->Next()) && ((mark->Next()->type & 0x0F)==MT_STOP)) {  // two stop marks, delete second
-+            dsyslog("stop mark (%i) folowed by stop mark (%i) delete second", mark->position, mark->Next()->position);
-+            marks.Del(mark->Next());
-+        }
 +        if (((mark->type & 0x0F)==MT_START) && (!mark->Next())) {      // delete start mark at the end
++            if (marks.GetFirst()->position != mark->position) {        // do not delete start mark
 +                dsyslog("deleting START mark at the end");
 +                marks.Del(mark);
-+                break;
++            }
 +        }
          mark=mark->Next();
      }
  }
-@@ -492,6 +672,12 @@
+@@ -492,6 +765,12 @@
      case MT_ASSUMEDSTOP:
          if (asprintf(&comment,"assuming stop (%i)",Mark->Position)==-1) comment=NULL;
          break;
@@ -1246,50 +1402,64 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
      case MT_LOGOSTART:
          if (asprintf(&comment,"detected logo start (%i)*",Mark->Position)==-1) comment=NULL;
          break;
-@@ -573,18 +759,18 @@
+@@ -573,18 +852,16 @@
          }
      }
  
 -    /*
 -    if ((Mark->Type==MT_LOGOSTART) && (!iStart) && (Mark->Position<abs(iStop)))
-+//    if ( (Mark->Type == MT_LOGOSTART) && (!iStart) && (Mark->Position < (abs(iStopA) - macontext.Video.Info.FramesPerSecond*MAXRANGE )))
 +    if (((Mark->Type & 0x0F)==MT_START) && (!iStart) && (Mark->Position < (abs(iStopA) - 2*macontext.Video.Info.FramesPerSecond*MAXRANGE )))
      {
 -        clMark *prev=marks.GetPrev(Mark->Position,MT_LOGOSTOP);
-+
 +        clMark *prev=marks.GetPrev(Mark->Position,(Mark->Type & 0xF0)|MT_STOP);
          if (prev)
          {
 -            int MARKDIFF=(int) (macontext.Video.Info.FramesPerSecond*10);
 -            if ((Mark->Position-prev->position)<MARKDIFF)
-+            int MARKDIFF=(int) (macontext.Video.Info.FramesPerSecond*10);    // maybe this is only ia short logo detection failure o
++            int MARKDIFF=(int) (macontext.Video.Info.FramesPerSecond*10);    // maybe this is only ia short logo detection failure 
 +            if ( (Mark->Position - prev->position) < MARKDIFF )
              {
                  double distance=(Mark->Position-prev->position)/macontext.Video.Info.FramesPerSecond;
 -                isyslog("mark distance too short (%.1fs), deleting %i,%i",distance,
 -                        prev->position,Mark->Position);
-+                isyslog("mark distance between STOP an START too short (%.1fs), deleting %i,%i",distance, prev->position,Mark->Position);
++                isyslog("mark distance between STOP and START too short (%.1fs), deleting %i,%i",distance, prev->position,Mark->Position);
                  if (!macontext.Video.Options.WeakMarksOk) inBroadCast=false;
                  marks.Del(prev);
                  if (comment) free(comment);
-@@ -592,9 +778,8 @@
+@@ -592,9 +869,26 @@
              }
          }
      }
 -    */
  
 -    if (((Mark->Type & 0x0F)==MT_STOP) && (!iStart) && (Mark->Position<abs(iStop)))
++    if (Mark->Type==MT_LOGOSTOP)
++    {
++        clMark *prev=marks.GetPrev(Mark->Position,MT_LOGOSTART);
++        if (prev)
++        {
++            int MARKDIFF=(int) (macontext.Video.Info.FramesPerSecond*10);    // maybe this is only ia short logo detection failure 
++            if ( (Mark->Position - prev->position) < MARKDIFF )
++            {
++                double distance=(Mark->Position-prev->position)/macontext.Video.Info.FramesPerSecond;
++                isyslog("mark distance between START and STOP too short (%.1fs), deleting %i,%i",distance, prev->position,Mark->Position);
++                if (!macontext.Video.Options.WeakMarksOk) inBroadCast=true;
++                marks.Del(prev);
++                if (comment) free(comment);
++                return;
++            }
++        }
++    }
++
 +    if (((Mark->Type & 0x0F)==MT_STOP) && (!iStart) && (Mark->Position < abs(iStopA) - macontext.Video.Info.FramesPerSecond*MAXRANGE ))
      {
          clMark *prev=marks.GetPrev(Mark->Position,(Mark->Type & 0xF0)|MT_START);
          if (prev)
-@@ -602,17 +787,18 @@
+@@ -602,17 +896,16 @@
              int MARKDIFF;
              if ((Mark->Type & 0xF0)==MT_LOGOCHANGE)
              {
 -                MARKDIFF=(int) (macontext.Video.Info.FramesPerSecond*180);
-+//                MARKDIFF=(int) (macontext.Video.Info.FramesPerSecond*120);
-+//                MARKDIFF=(int) (macontext.Video.Info.FramesPerSecond*80);
 +                MARKDIFF=(int) (macontext.Video.Info.FramesPerSecond*110);
              }
              else
@@ -1308,15 +1478,34 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
                  if (!macontext.Video.Options.WeakMarksOk) inBroadCast=false;
                  marks.Del(prev);
                  if (comment) free(comment);
-@@ -701,6 +887,7 @@
+@@ -701,7 +994,7 @@
          dsyslog("slept too much");
          return; // we already slept too much
      }
+-
 +    if (ptr_cDecoder) framecnt = ptr_cDecoder->GetFrameNumber();
- 
      bool notenough=true;
      do
-@@ -740,7 +927,7 @@
+     {
+@@ -712,7 +1005,7 @@
+             }
+             return;
+         }
+-
++       
+         int maxframes=statbuf.st_size/8;
+         if (maxframes<(framecnt+200))
+         {
+@@ -723,7 +1016,7 @@
+                     if (time(NULL)>(startTime+(time_t) length))
+                     {
+                         // "old" recording
+-                        tsyslog("assuming old recording, now>startTime+length");
++//                        tsyslog("assuming old recording, now>startTime+length");
+                         return;
+                     }
+                     else
+@@ -740,7 +1033,7 @@
                      return;
                  }
              }
@@ -1325,7 +1514,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
              unsigned int sleeptime=WAITTIME;
              time_t sleepstart=time(NULL);
              double slepttime=0;
-@@ -813,7 +1000,7 @@
+@@ -813,7 +1106,7 @@
          free(buf);
          save=true;
      }
@@ -1334,7 +1523,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
  }
  
  bool cMarkAdStandalone::ProcessFile2ndPass(clMark **Mark1, clMark **Mark2,int Number, off_t Offset,
-@@ -848,7 +1035,6 @@
+@@ -848,7 +1141,6 @@
      int actframe=Frame;
      int framecounter=0;
      int pframe=-1;
@@ -1342,7 +1531,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
      MarkAdPos *pos=NULL;
  
      while (framecounter<Frames)
-@@ -936,7 +1122,7 @@
+@@ -936,7 +1228,7 @@
                                  if (pframe!=lastiframe)
                                  {
                                      if (pn>mSTART) pos=video->ProcessOverlap(lastiframe,Frames,(pn==mBEFORE),
@@ -1351,7 +1540,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
                                      framecounter++;
                                  }
                                  if ((pos) && (pn==mAFTER))
-@@ -974,6 +1160,94 @@
+@@ -974,6 +1266,100 @@
      return true;
  }
  
@@ -1396,12 +1585,15 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
 +            dsyslog("cMarkAdStandalone::ProcessMark2ndPass() GetNextFrame failed at frame (%li)", ptr_cDecoder->GetFrameNumber());
 +            return false;
 +        }
-+        if (!ptr_cDecoder->isVideoIFrame()) continue;
++        if (!ptr_cDecoder->isVideoStream()) continue;
 +        if (!ptr_cDecoder->GetFrameInfo(&macontext)) {
-+            dsyslog("cMarkAdStandalone::ProcessMark2ndPass() GetFrameInfo failed at frame (%li)", ptr_cDecoder->GetFrameNumber());
-+            return false;
++            if (ptr_cDecoder->isVideoIFrame()) 
++                tsyslog("TRACE: cMarkAdStandalone::ProcessMark2ndPass() before mark GetFrameInfo failed at frame (%li)", ptr_cDecoder->GetFrameNumber());
++            continue;          
 +        }
-+        ptr_MarkAdPos=video->ProcessOverlap(ptr_cDecoder->GetFrameNumber(),iFrameCount,true,(macontext.Info.VPid.Type==MARKAD_PIDTYPE_VIDEO_H264));
++        if (ptr_cDecoder->isVideoIFrame()) {
++            ptr_MarkAdPos=video->ProcessOverlap(ptr_cDecoder->GetFrameNumber(),iFrameCount,true,(macontext.Info.VPid.Type==MARKAD_PIDTYPE_VIDEO_H264));
++        }
 +   }
 +
 +    fRange=macontext.Video.Info.FramesPerSecond*320; // 160s + 160s
@@ -1426,13 +1618,16 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
 +            dsyslog("cMarkAdStandalone::ProcessMark2ndPass() GetNextFrame failed at frame (%li)", ptr_cDecoder->GetFrameNumber());
 +            return false;
 +        }
-+        if (!ptr_cDecoder->isVideoIFrame()) continue;
++        if (!ptr_cDecoder->isVideoStream()) continue;
 +        if (!ptr_cDecoder->GetFrameInfo(&macontext)) {
-+            dsyslog("cMarkAdStandalone::ProcessMark2ndPass() GetFrameInfo failed at frame (%li)", ptr_cDecoder->GetFrameNumber());
-+            return false;
++            if (ptr_cDecoder->isVideoIFrame())
++                tsyslog("TRACE: cMarkAdStandalone::ProcessMark2ndPass() after mark GetFrameInfo failed at frame (%li)", ptr_cDecoder->GetFrameNumber());
++            continue;
 +        }
-+        ptr_MarkAdPos=video->ProcessOverlap(ptr_cDecoder->GetFrameNumber(),iFrameCount,false,(macontext.Info.VPid.Type==MARKAD_PIDTYPE_VIDEO_H264));
-+        if (ptr_MarkAdPos) dsyslog("cMarkAdStandalone::ProcessMark2ndPass overlap in frames (%i,%i)", ptr_MarkAdPos->FrameNumberBefore, ptr_MarkAdPos->FrameNumberAfter);
++        if (ptr_cDecoder->isVideoIFrame()) {
++            ptr_MarkAdPos=video->ProcessOverlap(ptr_cDecoder->GetFrameNumber(),iFrameCount,false,(macontext.Info.VPid.Type==MARKAD_PIDTYPE_VIDEO_H264));
++        }
++        if (ptr_MarkAdPos) dsyslog("cMarkAdStandalone::ProcessMark2ndPass found overlap in frames (%i,%i)", ptr_MarkAdPos->FrameNumberBefore, ptr_MarkAdPos->FrameNumberAfter);
 +        if (ptr_MarkAdPos) {
 +            // found overlap
 +            ChangeMarks(mark1,mark2,ptr_MarkAdPos);
@@ -1446,7 +1641,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
  void cMarkAdStandalone::Process2ndPass()
  {
      if (abort) return;
-@@ -998,13 +1272,17 @@
+@@ -998,13 +1384,17 @@
      clMark *p1=NULL,*p2=NULL;
  
      if (marks.Count()<4) return; // we cannot do much without marks
@@ -1465,7 +1660,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
      while ((p1) && (p2))
      {
          if (!infoheader)
-@@ -1015,25 +1293,31 @@
+@@ -1015,25 +1405,31 @@
          off_t offset;
          int number,frame,iframes;
          int frange=macontext.Video.Info.FramesPerSecond*120; // 40s + 80s
@@ -1511,7 +1706,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
          p1=p2->Next();
          if (p1)
          {
-@@ -1046,6 +1330,7 @@
+@@ -1046,6 +1442,7 @@
      }
  }
  
@@ -1519,7 +1714,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
  bool cMarkAdStandalone::ProcessFile(int Number)
  {
      if (!directory) return false;
-@@ -1075,7 +1360,6 @@
+@@ -1075,7 +1472,6 @@
      }
  
      int f=open(fbuf,O_RDONLY);
@@ -1527,7 +1722,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
      if (f==-1) {
          if (isTS) {
              dsyslog("failed to open %05i.ts",Number);
-@@ -1084,13 +1368,14 @@
+@@ -1084,13 +1480,14 @@
          }
          return false;
      }
@@ -1543,7 +1738,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
  again:
      while ((dataread=read(f,data,datalen))>0)
      {
-@@ -1183,13 +1468,17 @@
+@@ -1183,13 +1580,17 @@
                                              AddMark(&vmarks->Number[i]);
                                          }
                                      }
@@ -1564,7 +1759,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
                                          if (lastiframe>chkSTOP) CheckStop();
                                      }
                                      pframe=lastiframe;
-@@ -1277,28 +1566,126 @@
+@@ -1277,28 +1678,128 @@
      return ret;
  }
  
@@ -1575,10 +1770,10 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
 +        abort=true;
 +    }
 +
-+    ptr_cDecoder->GetFrameInfo(&macontext);
-+    if(ptr_cDecoder->isVideoStream()) {
-+        if(ptr_cDecoder->isVideoIFrame()) {
-+            if (ptr_cDecoder->isInterlacedVideo() && !macontext.Video.Info.Interlaced && (macontext.Info.VPid.Type==MARKAD_PIDTYPE_VIDEO_H264)) {
++    if (ptr_cDecoder->GetFrameInfo(&macontext)) {
++        if (ptr_cDecoder->isVideoStream()) {
++            if (ptr_cDecoder->isInterlacedVideo() && !macontext.Video.Info.Interlaced && (macontext.Info.VPid.Type==MARKAD_PIDTYPE_VIDEO_H264) &&
++                                                     (ptr_cDecoder->GetVideoFramesPerSecond()==25) && (ptr_cDecoder->GetVideoRealFrameRate()==50)) {
 +                dsyslog("change internal frame rate to handle H.264 interlaced video");
 +                macontext.Video.Info.FramesPerSecond*=2;
 +                macontext.Video.Info.Interlaced=true;
@@ -1604,34 +1799,35 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
 +                return;
 +            }
 +
-+            if ((lastiframe>iStopA-macontext.Video.Info.FramesPerSecond*MAXRANGE) && 
++            if ((lastiframe>iStopA-macontext.Video.Info.FramesPerSecond*MAXRANGE) &&
 +                                     ((macontext.Video.Options.IgnoreBlackScreenDetection) || (macontext.Video.Options.IgnoreLogoDetection))) {
-+                    dsyslog("start logo and black screen detection at frame (%li)",ptr_cDecoder->GetFrameNumber());
++                    isyslog("restart logo and black screen detection at frame (%li)",ptr_cDecoder->GetFrameNumber());
 +                    bDecodeVideo=true;
 +                    macontext.Video.Options.IgnoreBlackScreenDetection=false;   // use black sceen setection only to find end mark
-+                    macontext.Video.Options.IgnoreLogoDetection=false;
++                    if (macontext.Video.Options.IgnoreLogoDetection==true) {
++                        macontext.Video.Options.IgnoreLogoDetection=false;
++                        if (video) video->Clear();    // reset logo decoder status
++                    }
 +            }
 +
-+            if (bDecodeVideo) {
-+                MarkAdMarks *vmarks=video->Process(lastiframe,iframe);
-+                if (vmarks) {
-+                    for (int i=0; i<vmarks->Count; i++) {
-+                        AddMark(&vmarks->Number[i]);
-+                    }
-+                }
-+//          if (lastiframe == 14716) SaveFrame(lastiframe);  // TODO: JUST FOR DEBUGGING!
-+                if (iStart>0) {
-+                    if ((inBroadCast) && (lastiframe>chkSTART)) CheckStart();
-+                }
-+                if ((iStop>0) && (iStopA>0)) {
-+                    if (lastiframe>chkSTOP) CheckStop();
++            MarkAdMarks *vmarks=video->Process(lastiframe,iframe);
++            if (vmarks) {
++                for (int i=0; i<vmarks->Count; i++) {
++                    AddMark(&vmarks->Number[i]);
 +                }
 +            }
++//          if (lastiframe == 14716) SaveFrame(lastiframe);  // TODO: JUST FOR DEBUGGING!
++            if (iStart>0) {
++                if ((inBroadCast) && (lastiframe>chkSTART)) CheckStart();
++            }
++            if ((iStop>0) && (iStopA>0)) {
++                if (lastiframe>chkSTOP) CheckStop();
++            }
 +        }
-+    }
-+    if(ptr_cDecoder->isAudioAC3Frame()) {
-+        MarkAdMark *amark=audio->Process(lastiframe,iframe);
-+        if (amark) AddMark(amark);
++        if(ptr_cDecoder->isAudioAC3Frame()) {
++             MarkAdMark *amark=audio->Process(lastiframe,iframe);
++            if (amark) AddMark(amark);
++        }
 +    }
 +}
 +
@@ -1643,7 +1839,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
 -        if (!ProcessFile(i)) break;
 -        if ((gotendmark) && (!macontext.Config->GenIndex)) break;
 +    if (macontext.Config->use_cDecoder) {
-+        dsyslog("use cDecoder class");
++        dsyslog("use cDecoder class V0.%i", CDECODERVERSION);
 +        ptr_cDecoder = new cDecoder();
 +        CheckIndexGrowing();
 +        while(ptr_cDecoder->DecodeDir(directory)) {
@@ -1653,13 +1849,14 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
 +            }
 +            if(ptr_cDecoder->GetFrameNumber() < 0) {
 +                macontext.Video.Info.Height=ptr_cDecoder->GetVideoHeight();
-+                isyslog("video hight %i", macontext.Video.Info.Height);
++                isyslog("video hight: %i", macontext.Video.Info.Height);
 +
 +                macontext.Video.Info.Width=ptr_cDecoder->GetVideoWidth();
-+                isyslog("video width %i", macontext.Video.Info.Width);
++                isyslog("video width: %i", macontext.Video.Info.Width);
 +
 +                macontext.Video.Info.FramesPerSecond=ptr_cDecoder->GetVideoFramesPerSecond();
-+                isyslog("video frames per second %f", macontext.Video.Info.FramesPerSecond);
++                isyslog("average frame rate %i frames per second",(int) macontext.Video.Info.FramesPerSecond);
++                isyslog("real frame rate    %i frames per second",ptr_cDecoder->GetVideoRealFrameRate());
 +
 +                CalculateCheckPositions(tStart*macontext.Video.Info.FramesPerSecond);
 +            }
@@ -1702,7 +1899,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
  }
  
  void cMarkAdStandalone::Process()
-@@ -1312,58 +1699,62 @@
+@@ -1312,58 +1813,62 @@
      marks.CloseIndex(directory,isTS);
      if (!abort)
      {
@@ -1804,7 +2001,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
                  }
              }
          }
-@@ -1677,6 +2068,8 @@
+@@ -1677,6 +2182,8 @@
      int len=strlen(macontext.Info.ChannelName);
      if (!len) return false;
  
@@ -1813,7 +2010,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
      DIR *dir=opendir(macontext.Config->logoDirectory);
      if (!dir) return false;
  
-@@ -1815,6 +2208,7 @@
+@@ -1815,6 +2322,7 @@
              }
          }
      }
@@ -1821,7 +2018,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
      if (line) free(line);
  
      if ((length) && (!bIgnoreTimerInfo) && (startTime))
-@@ -1827,9 +2221,10 @@
+@@ -1827,9 +2335,10 @@
              {
                  if (length+tStart>0)
                  {
@@ -1834,17 +2031,16 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
                      tStart=1;
                  }
                  else
-@@ -2216,7 +2611,8 @@
+@@ -2216,7 +2725,7 @@
      duplicate=false;
      title[0]=0;
  
 -    memset(&macontext,0,sizeof(macontext));
 +    macontext={};
-+//    memset(&macontext,0,sizeof(macontext));
      macontext.Config=config;
  
      bDecodeVideo=config->DecodeVideo;
-@@ -2370,7 +2766,7 @@
+@@ -2370,7 +2879,7 @@
  
      if (tStart>1) {
          if (tStart<60) tStart=60;
@@ -1853,7 +2049,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
      }
      if (length) isyslog("broadcast length %im",length/60);
  
-@@ -2580,6 +2976,10 @@
+@@ -2580,6 +3089,10 @@
             "                  port of a remote VDR for OSD messages\n"
             "                --astopoffs=<value> (default is 100)\n"
             "                  assumed stop offset in seconds range from 0 to 240\n"
@@ -1864,18 +2060,18 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
             "\ncmd: one of\n"
             "-                            dummy-parameter if called directly\n"
             "after                        markad starts to analyze the recording\n"
-@@ -2656,8 +3056,8 @@
+@@ -2655,9 +3168,7 @@
+     int online=0;
      bool bPass2Only=false;
      bool bPass1Only=false;
- 
+-
 -    struct config config;
 -    memset(&config,0,sizeof(config));
 +    struct config config={};
-+//    memset(&config,0,sizeof(config));
  
      // set defaults
      config.DecodeVideo=true;
-@@ -2668,6 +3068,7 @@
+@@ -2668,6 +3179,7 @@
      config.logoHeight=-1;
      config.threads=-1;
      config.astopoffs=100;
@@ -1883,7 +2079,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
      strcpy(config.svdrphost,"127.0.0.1");
      strcpy(config.logoDirectory,"/var/lib/markad");
  
-@@ -2688,8 +3089,7 @@
+@@ -2688,8 +3200,7 @@
          int option_index = 0;
          static struct option long_options[] =
          {
@@ -1893,7 +2089,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
              {"background", 0, 0, 'b'},
              {"comments", 0, 0, 'c'},
              {"disable", 1, 0, 'd'},
-@@ -2705,6 +3105,8 @@
+@@ -2705,6 +3216,8 @@
  
              {"asd",0,0,6},
              {"astopoffs",1,0,12},
@@ -1902,12 +2098,11 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
              {"loglevel",1,0,2},
              {"markfile",1,0,1},
              {"nopid",0,0,5},
-@@ -2866,8 +3268,11 @@
+@@ -2866,8 +3379,10 @@
              // --extractlogo
              str=optarg;
              ntok=0;
 -            while (tok=strtok(str,","))
-+//            while (tok=strtok(str,","))
 +            while (true)
              {
 +                tok=strtok(str,",");
@@ -1915,7 +2110,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
                  switch (ntok)
                  {
                  case 0:
-@@ -3028,6 +3433,22 @@
+@@ -3028,6 +3543,22 @@
              }
              break;
  
@@ -1938,7 +2133,7 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
          default:
              printf ("? getopt returned character code 0%o ? (option_index %d)\n", c,option_index);
          }
-@@ -3063,6 +3484,7 @@
+@@ -3063,6 +3594,7 @@
                  if ( strstr(argv[optind],".rec") != NULL )
                  {
                      recDir=realpath(argv[optind],NULL);
@@ -1946,23 +2141,24 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.cpp b/comma
                  }
              }
              optind++;
-@@ -3205,6 +3627,13 @@
+@@ -3205,6 +3737,14 @@
          cmasta = new cMarkAdStandalone(recDir,&config);
          if (!cmasta) return -1;
  
-+        esyslog("parameter --loglevel is set to %i", SysLogLevel); 
++        isyslog("parameter --loglevel is set to %i", SysLogLevel); 
 +        dsyslog("parameter --logocachedir is set to %s",config.logoDirectory);
-+        dsyslog("parameter --log2rec is set"); 
 +        dsyslog("parameter --threads is set to %i", config.threads); 
 +        dsyslog("parameter --astopoffs is set to %i",config.astopoffs); 
-+        dsyslog("parameter --cDecoder is set"); 
++        if (LOG2REC) dsyslog("parameter --log2rec is set"); 
++        if (config.use_cDecoder) dsyslog("parameter --cDecoder is set"); 
++        if (config.Before) dsyslog("parameter Before is set"); 
 +
          if (!bPass2Only) cmasta->Process();
          if (!bPass1Only) cmasta->Process2ndPass();
          delete cmasta;
 diff -u --new-file '--exclude=version.h' a/command/markad-standalone.h b/command/markad-standalone.h
---- a/command/markad-standalone.h	2017-03-13 18:56:14.000000000 +0100
-+++ b/command/markad-standalone.h	2019-12-02 16:53:58.322943443 +0100
+--- a/command/markad-standalone.h	2020-01-11 10:19:55.243477710 +0000
++++ b/command/markad-standalone.h	2020-01-11 12:26:37.611880096 +0000
 @@ -210,8 +210,10 @@
      int tStart;        // pretimer in seconds
      int iStart;        // pretimer in frames (negative if unset)
@@ -1987,8 +2183,8 @@ diff -u --new-file '--exclude=version.h' a/command/markad-standalone.h b/command
      cMarkAdStandalone(const char *Directory, const MarkAdConfig *config);
      ~cMarkAdStandalone();
 diff -u --new-file '--exclude=version.h' a/command/marks.cpp b/command/marks.cpp
---- a/command/marks.cpp	2017-03-13 18:56:14.000000000 +0100
-+++ b/command/marks.cpp	2019-12-02 16:53:58.322943443 +0100
+--- a/command/marks.cpp	2020-01-11 10:19:55.243477710 +0000
++++ b/command/marks.cpp	2020-01-11 12:26:37.611880096 +0000
 @@ -16,6 +16,11 @@
  #include <fcntl.h>
  
@@ -2001,7 +2197,60 @@ diff -u --new-file '--exclude=version.h' a/command/marks.cpp b/command/marks.cpp
  
  clMark::clMark(int Type, int Position, const char *Comment)
  {
-@@ -346,12 +351,19 @@
+@@ -191,7 +196,12 @@
+     clMark *m2=GetNext(Position,Type,Mask);
+ 
+     if (!m1 && !m2) return NULL;
+-    if (!m1 && m2) return m2;
++
++    if (!m1 && m2) {
++        if (abs(Position-m2->position)>Frames) return NULL;
++        else return m2;
++    }
++
+     if (m1 && !m2)
+     {
+         if (abs(Position-m1->position)>Frames) return NULL;
+@@ -200,10 +210,12 @@
+ 
+     if (abs(m1->position-Position)>abs(m2->position-Position))
+     {
+-        return m2;
++        if (abs(Position-m2->position)>Frames) return NULL;
++        else return m2;
+     }
+     else
+     {
++        if (abs(Position-m1->position)>Frames) return NULL;
+         return m1;
+     }
+ }
+@@ -259,15 +271,19 @@
+ 
+ clMark *clMarks::Add(int Type, int Position,const char *Comment)
+ {
++
+     clMark *newmark;
+     if ((newmark=Get(Position)))
+     {
+-        if ((newmark->comment) && (Comment))
+-        {
+-            free(newmark->comment);
+-            newmark->comment=strdup(Comment);
++        dsyslog("duplicate mark on position %i type 0x%X and type 0x%x", Position, Type, newmark->type);
++        if (Type > newmark->type){   // keep the stronger mark
++            if ((newmark->comment) && (Comment))
++            {
++                free(newmark->comment);
++                newmark->comment=strdup(Comment);
++            }
++            newmark->type=Type;
+         }
+-        newmark->type=Type;
+         return newmark;
+     }
+ 
+@@ -346,12 +362,19 @@
      return NULL;
  }
  
@@ -2015,15 +2264,15 @@ diff -u --new-file '--exclude=version.h' a/command/marks.cpp b/command/marks.cpp
 -    int f = int(modf((Index+0.5)/FramesPerSecond,&Seconds)*FramesPerSecond+1);
 +    int f=0;
 +    if (maContext->Config->use_cDecoder && (maContext->Info.VPid.Type==MARKAD_PIDTYPE_VIDEO_H264) && ptr_cDecoder) {
-+	f = int(modf(float(ptr_cDecoder->GetTimeFromIFrame(Index))/100,&Seconds)*100);
++        f = int(modf(float(ptr_cDecoder->GetTimeFromIFrame(Index))/100,&Seconds)*100);
 +    }
 +    else {
-+    	f = int(modf((Index+0.5)/FramesPerSecond,&Seconds)*FramesPerSecond+1);
++        f = int(modf((Index+0.5)/FramesPerSecond,&Seconds)*FramesPerSecond+1);
 +    }
      int s = int(Seconds);
      int m = s / 60 % 60;
      int h = s / 3600;
-@@ -689,7 +701,7 @@
+@@ -689,7 +712,7 @@
      return true;
  }
  
@@ -2032,7 +2281,7 @@ diff -u --new-file '--exclude=version.h' a/command/marks.cpp b/command/marks.cpp
  {
      if (!first) return false;
      if ((savedcount==count) && (!Force)) return false;
-@@ -709,7 +721,7 @@
+@@ -709,7 +732,7 @@
      clMark *mark=first;
      while (mark)
      {
@@ -2042,8 +2291,8 @@ diff -u --new-file '--exclude=version.h' a/command/marks.cpp b/command/marks.cpp
          {
              fprintf(mf,"%s %s\n",buf,mark->comment ? mark->comment : "");
 diff -u --new-file '--exclude=version.h' a/command/marks.h b/command/marks.h
---- a/command/marks.h	2019-12-02 16:53:58.000000000 +0100
-+++ b/command/marks.h	2019-12-02 16:53:58.322943443 +0100
+--- a/command/marks.h	2020-01-11 12:26:37.339877356 +0000
++++ b/command/marks.h	2020-01-11 12:26:37.611880096 +0000
 @@ -9,6 +9,8 @@
  #define __marks_h_
  
@@ -2072,8 +2321,8 @@ diff -u --new-file '--exclude=version.h' a/command/marks.h b/command/marks.h
  #define IERR_TOOSHORT 2
  #define IERR_SEEK 3
 diff -u --new-file '--exclude=version.h' a/command/video.cpp b/command/video.cpp
---- a/command/video.cpp	2017-03-13 18:56:14.000000000 +0100
-+++ b/command/video.cpp	2019-12-03 18:40:07.412953344 +0100
+--- a/command/video.cpp	2020-01-11 10:19:55.247477749 +0000
++++ b/command/video.cpp	2020-01-11 12:26:37.611880096 +0000
 @@ -49,11 +49,12 @@
          LOGOHEIGHT=LOGO_DEFHDHEIGHT;
          LOGOWIDTH=LOGO_DEFHDWIDTH;
@@ -2117,7 +2366,7 @@ diff -u --new-file '--exclude=version.h' a/command/video.cpp b/command/video.cpp
      if (!processed) return LOGO_ERROR;
  
 -    //tsyslog("rp=%5i mp=%5i mpV=%5.f mpI=%5.f i=%3i s=%i",rpixel,mpixel,(mpixel*LOGO_VMARK),(mpixel*LOGO_IMARK),area.intensity,area.status);
-+    tsyslog("frame (%6i) rp=%5i mp=%5i mpV=%5.f mpI=%5.f i=%3i s=%i",framenumber, rpixel,mpixel,(mpixel*LOGO_VMARK),(mpixel*LOGO_IMARK),area.intensity,area.status);
++//    tsyslog("frame (%6i) rp=%5i mp=%5i mpV=%5.f mpI=%5.f i=%3i s=%i",framenumber, rpixel,mpixel,(mpixel*LOGO_VMARK),(mpixel*LOGO_IMARK),area.intensity,area.status);
  
      if (processed==1)
      {
@@ -2274,11 +2523,7 @@ diff -u --new-file '--exclude=version.h' a/command/video.cpp b/command/video.cpp
      return false;
  }
  
-@@ -727,9 +821,11 @@
-         for (int A=start; A<histcnt[OV_AFTER]; A++)
-         {
-             //printf("%6i %6i ",histbuf[OV_BEFORE][B].framenumber,histbuf[OV_AFTER][A].framenumber);
-+//            dsyslog("---cMarkAdOverlap::Detect() similarCutOff %8i",similarCutOff);
+@@ -730,6 +824,7 @@
              bool simil=areSimilar(histbuf[OV_BEFORE][B].histogram,histbuf[OV_AFTER][A].histogram);
              if (simil)
              {
@@ -2286,16 +2531,17 @@ diff -u --new-file '--exclude=version.h' a/command/video.cpp b/command/video.cpp
                  tmpA=A;
                  tmpB=B;
                  start=A+1;
-@@ -741,7 +837,7 @@
+@@ -741,8 +836,7 @@
              }
              else
              {
 -                //if (simcnt) printf("simcnt=%i\n",simcnt);
+-
 +//                if (simcnt) dsyslog("---simcnt=%i",simcnt);
- 
                  if (simcnt>similarMaxCnt)
                  {
-@@ -777,11 +873,20 @@
+                     if ((histbuf[OV_BEFORE][tmpB].framenumber>result.FrameNumberBefore) &&
+@@ -777,11 +871,20 @@
  
  MarkAdPos *cMarkAdOverlap::Process(int FrameNumber, int Frames, bool BeforeAd, bool H264)
  {
@@ -2318,7 +2564,7 @@ diff -u --new-file '--exclude=version.h' a/command/video.cpp b/command/video.cpp
      }
  
      if (BeforeAd)
-@@ -831,8 +936,9 @@
+@@ -831,8 +934,9 @@
  {
      macontext=maContext;
  
@@ -2330,7 +2576,7 @@ diff -u --new-file '--exclude=version.h' a/command/video.cpp b/command/video.cpp
      hborder=new cMarkAdBlackBordersHoriz(maContext);
      vborder=new cMarkAdBlackBordersVert(maContext);
      logo = new cMarkAdLogo(maContext);
-@@ -843,6 +949,7 @@
+@@ -843,6 +947,7 @@
  cMarkAdVideo::~cMarkAdVideo()
  {
      resetmarks();
@@ -2338,7 +2584,7 @@ diff -u --new-file '--exclude=version.h' a/command/video.cpp b/command/video.cpp
      if (hborder) delete hborder;
      if (vborder) delete vborder;
      if (logo) delete logo;
-@@ -855,6 +962,7 @@
+@@ -855,6 +960,7 @@
      aspectratio.Den=0;
      framelast=0;
      framebeforelast=0;
@@ -2346,7 +2592,7 @@ diff -u --new-file '--exclude=version.h' a/command/video.cpp b/command/video.cpp
      if (hborder) hborder->Clear();
      if (vborder) vborder->Clear();
      if (logo) logo->Clear();
-@@ -862,7 +970,8 @@
+@@ -862,7 +968,8 @@
  
  void cMarkAdVideo::resetmarks()
  {
@@ -2356,7 +2602,7 @@ diff -u --new-file '--exclude=version.h' a/command/video.cpp b/command/video.cpp
  }
  
  bool cMarkAdVideo::addmark(int type, int position, MarkAdAspectRatio *before,
-@@ -906,6 +1015,7 @@
+@@ -906,6 +1013,7 @@
  
  MarkAdPos *cMarkAdVideo::ProcessOverlap(int FrameNumber, int Frames, bool BeforeAd, bool H264)
  {
@@ -2364,7 +2610,7 @@ diff -u --new-file '--exclude=version.h' a/command/video.cpp b/command/video.cpp
      if (!FrameNumber) return NULL;
      if (!overlap) overlap=new cMarkAdOverlap(macontext);
      if (!overlap) return NULL;
-@@ -918,15 +1028,25 @@
+@@ -918,15 +1026,25 @@
      if ((!FrameNumber) && (!FrameNumberNext)) return NULL;
  
      resetmarks();
@@ -2392,7 +2638,7 @@ diff -u --new-file '--exclude=version.h' a/command/video.cpp b/command/video.cpp
      if ((hret<0) && (hborderframenumber!=-1))
      {
          addmark(MT_HBORDERSTOP,hborderframenumber);
-@@ -934,12 +1054,10 @@
+@@ -934,12 +1052,10 @@
  
      int vborderframenumber;
      int vret=vborder->Process(FrameNumber,&vborderframenumber);
@@ -2405,7 +2651,7 @@ diff -u --new-file '--exclude=version.h' a/command/video.cpp b/command/video.cpp
      if ((vret<0) && (vborderframenumber!=-1))
      {
          addmark(MT_VBORDERSTOP,vborderframenumber);
-@@ -967,17 +1085,21 @@
+@@ -967,17 +1083,22 @@
                  addmark(MT_HBORDERSTOP,framebeforelast);
                  hborder->SetStatusBorderInvisible();
              }
@@ -2415,7 +2661,8 @@ diff -u --new-file '--exclude=version.h' a/command/video.cpp b/command/video.cpp
 -            {
 -                addmark(MT_ASPECTSTART,start ? FrameNumber : FrameNumberNext,
 -                        &aspectratio,&macontext->Video.Info.AspectRatio);
-+            if ((macontext->Info.AspectRatio.Num == 4) && (macontext->Info.AspectRatio.Den == 3)) {
++            if (((macontext->Info.AspectRatio.Num == 4) && (macontext->Info.AspectRatio.Den == 3)) || 
++	        ((macontext->Info.AspectRatio.Num == 0) && (macontext->Info.AspectRatio.Den == 0))) {
 +                if ((macontext->Video.Info.AspectRatio.Num==4) && (macontext->Video.Info.AspectRatio.Den==3)) {
 +                    addmark(MT_ASPECTSTART,start ? FrameNumber : FrameNumberNext,&aspectratio,&macontext->Video.Info.AspectRatio);
 +                }
@@ -2438,8 +2685,8 @@ diff -u --new-file '--exclude=version.h' a/command/video.cpp b/command/video.cpp
          }
  
 diff -u --new-file '--exclude=version.h' a/command/video.h b/command/video.h
---- a/command/video.h	2017-03-13 18:56:14.000000000 +0100
-+++ b/command/video.h	2019-12-02 16:53:58.322943443 +0100
+--- a/command/video.h	2020-01-11 10:19:55.247477749 +0000
++++ b/command/video.h	2020-01-11 12:26:37.611880096 +0000
 @@ -34,6 +34,13 @@
  
  enum

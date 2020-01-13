@@ -1,10 +1,10 @@
---- a/command/decoder.cpp	2019-11-29 16:43:13.167805436 +0100
-+++ b/command/decoder.cpp	2019-11-29 16:51:16.644580236 +0100
+--- a/command/decoder.cpp	2020-01-11 11:05:25.447486530 +0000
++++ b/command/decoder.cpp	2020-01-11 11:06:14.675965652 +0000
 @@ -122,7 +122,9 @@
  #if LIBAVCODEC_VERSION_INT < ((53<<16)+(7<<8)+1)
      avcodec_init();
  #endif
-+#if LIBAVCODEC_VERSION_INT < ((58<<16)+(54<<8)+100)
++#if LIBAVCODEC_VERSION_INT < ((58<<16)+(35<<8)+100)
      avcodec_register_all();
 +#endif
  
