@@ -4,7 +4,7 @@
 
 Name:           vdr-markad
 Version:        0.1.4
-Release:        30.%{gitdate}git%{shortcommit0}%{?dist}
+Release:        31.%{gitdate}git%{shortcommit0}%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 # how to get the tarball
@@ -61,6 +61,9 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
+* Wed Feb 05 2020 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 0.1.4-31.20170313gitea2e182
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
 * Mon Jan 13 2020 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-30.20170313gitea2e182
 - Replace 00-markad-libavcodec58-V0-01.diff by 00-markad-libavcodec58-V0-02.diff
 - Replace 02-deprecated-V0-04.diff by 02-markad-deprecated-V0-05.diff
