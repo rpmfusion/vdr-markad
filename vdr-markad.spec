@@ -4,7 +4,7 @@
 
 Name:           vdr-markad
 Version:        0.1.4
-Release:        31.%{gitdate}git%{shortcommit0}%{?dist}
+Release:        32.%{gitdate}git%{shortcommit0}%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 # how to get the tarball
@@ -61,6 +61,9 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
+* Sat Feb 22 2020 RPM Fusion Release Engineering <leigh123linux@googlemail.com> - 0.1.4-32.20170313gitea2e182
+- Rebuild for ffmpeg-4.3 git
+
 * Wed Feb 05 2020 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 0.1.4-31.20170313gitea2e182
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
