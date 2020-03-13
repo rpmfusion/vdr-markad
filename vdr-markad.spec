@@ -4,7 +4,7 @@
 
 Name:           vdr-markad
 Version:        0.1.4
-Release:        32.%{gitdate}git%{shortcommit0}%{?dist}
+Release:        33.%{gitdate}git%{shortcommit0}%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 # how to get the tarball
@@ -13,13 +13,7 @@ License:        GPLv2+
 URL:            http://projects.vdr-developer.org/projects/plg-markad
 Source0:        http://projects.vdr-developer.org/git/vdr-plugin-markad.git/snapshot/vdr-plugin-markad-%{commit0}.tar.bz2
 Source1:        %{name}.conf
-Patch0:         00-markad-libavcodec58-V0-02.diff
-Patch1:         01-markad-Makefile-V0-06.diff
-Patch2:         02-markad-deprecated-V0-05.diff
-Patch3:         03-markad-decoder-V0-59.diff
-
-
-
+Patch0:         03-markad-decoder-V1-00.diff
 BuildRequires:  gcc-c++
 BuildRequires:  vdr-devel >= 1.7.30
 BuildRequires:  ffmpeg-devel >= 4.1
@@ -61,6 +55,12 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
+* Fri Mar 13 2020 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-33.20170313gitea2e182
+- Replace 03-markad-decoder-V0-59.diff by 03-markad-decoder-V0-59.diff
+- Dropped 00-markad-libavcodec58-V0-02.diff
+- Dropped 01-markad-Makefile-V0-06.diff
+- Dropped 02-markad-deprecated-V0-05.diff
+
 * Sat Feb 22 2020 RPM Fusion Release Engineering <leigh123linux@googlemail.com> - 0.1.4-32.20170313gitea2e182
 - Rebuild for ffmpeg-4.3 git
 
