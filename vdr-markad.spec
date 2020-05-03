@@ -1,19 +1,14 @@
-%global commit0 ea2e182ec798375f3830f8b794e7408576f139ad
-%global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
-%global gitdate 20170313
-
 Name:           vdr-markad
-Version:        0.1.4
-Release:        33.%{gitdate}git%{shortcommit0}%{?dist}
+Version:        2.0.3
+Release:        1%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 # how to get the tarball
 # go to http://projects.vdr-developer.org/git/vdr-plugin-markad.git/commit/
 # click the link behind commit, then select the download links below.
-URL:            http://projects.vdr-developer.org/projects/plg-markad
-Source0:        http://projects.vdr-developer.org/git/vdr-plugin-markad.git/snapshot/vdr-plugin-markad-%{commit0}.tar.bz2
+URL:            https://github.com/kfb77/vdr-plugin-markad
+Source0:        https://github.com/kfb77/vdr-plugin-markad/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}.conf
-Patch0:         03-markad-decoder-V1-00.diff
 BuildRequires:  gcc-c++
 BuildRequires:  vdr-devel >= 1.7.30
 BuildRequires:  ffmpeg-devel >= 4.1
@@ -23,7 +18,7 @@ Requires:       vdr(abi)%{?_isa} = %{vdr_apiversion}
 VDR-Plugin: markad - %{summary}
 
 %prep
-%autosetup -p 1 -n vdr-plugin-markad-%{commit0}
+%autosetup -p 1 -n vdr-plugin-markad-%{version}
 
 sed -i -e 's|$(DESTDIR)/var/lib/markad|$(DESTDIR)%{vdr_vardir}/markad/|' command/Makefile
 sed -i -e 's|/LC_MESSAGES/markad.mo|/LC_MESSAGES/vdr-markad.mo|' command/Makefile
@@ -55,6 +50,11 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
+* Sun May 03 2020 Martin Gansser <martinkg@fedoraproject.org> - 2.0.3-1
+- Switched URL to https://github.com/kfb77/vdr-plugin-markad
+- Update to 2.0.3
+- Dropped 03-markad-decoder-V1-00.diff
+
 * Fri Mar 13 2020 Martin Gansser <martinkg@fedoraproject.org> - 0.1.4-33.20170313gitea2e182
 - Replace 03-markad-decoder-V0-59.diff by 03-markad-decoder-V0-59.diff
 - Dropped 00-markad-libavcodec58-V0-02.diff
