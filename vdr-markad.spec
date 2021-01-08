@@ -1,6 +1,6 @@
 Name:           vdr-markad
-Version:        2.5.1
-Release:        2%{?dist}
+Version:        2.5.2
+Release:        1%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 # how to get the tarball
@@ -50,6 +50,9 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
+* Fri Jan 08 2021 Martin Gansser <martinkg@fedoraproject.org> - 2.5.2-1
+- Update to 2.5.2
+
 * Mon Jan 04 2021 Martin Gansser <martinkg@fedoraproject.org> - 2.5.1-2
 - Rebuilt for new VDR API version
 
