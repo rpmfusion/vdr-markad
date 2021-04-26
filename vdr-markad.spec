@@ -1,6 +1,6 @@
 Name:           vdr-markad
 Version:        3.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 URL:            https://github.com/kfb77/vdr-plugin-markad
@@ -22,7 +22,7 @@ sed -i -e 's|$(DESTDIR)/var/lib/markad|$(DESTDIR)%{vdr_vardir}/markad/|' command
 sed -i -e 's|/LC_MESSAGES/markad.mo|/LC_MESSAGES/vdr-markad.mo|' command/Makefile
 
 %build
-make CFLAGS="%{optflags} -fPIC" CXXFLAGS="%{optflags} -fPIC" all
+%make_build CFLAGS="%{optflags} -fPIC" CXXFLAGS="%{optflags} -fPIC" all
 
 %install
 make install DESTDIR=%{buildroot}
@@ -48,7 +48,10 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
-* Sat Apr 24 2021 Martin Gansser <martinkg@fedoraproject.org> - 3.0.9-1
+* Mon Apr 26 2021 Martin Gansser <martinkg@fedoraproject.org> - 3.0.0-2
+- Rebuilt for new VDR API version
+
+* Sat Apr 24 2021 Martin Gansser <martinkg@fedoraproject.org> - 3.0.0-1
 - Update to 3.0.0
 
 * Thu Apr 22 2021 Martin Gansser <martinkg@fedoraproject.org> - 2.6.8-1
