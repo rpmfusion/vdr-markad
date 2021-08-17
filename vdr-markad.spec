@@ -1,6 +1,6 @@
 Name:           vdr-markad
-Version:        3.0.8
-Release:        2%{?dist}
+Version:        3.0.9
+Release:        1%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 URL:            https://github.com/kfb77/vdr-plugin-markad
@@ -48,6 +48,9 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
+* Tue Aug 17 2021 Martin Gansser <martinkg@fedoraproject.org> - 3.0.9-1
+- Update to 3.0.9
+
 * Tue Aug 03 2021 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 3.0.8-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
