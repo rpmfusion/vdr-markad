@@ -48,7 +48,7 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
-* Fri Feb 04 2022 Martin Gansser <martinkg@fedoraproject.org> - 3.0.19-3
+* Sat Feb 05 2022 Martin Gansser <martinkg@fedoraproject.org> - 3.0.19-3
 - Rebuilt for new VDR API version
 
 * Thu Dec 30 2021 Martin Gansser <martinkg@fedoraproject.org> - 3.0.19-2
