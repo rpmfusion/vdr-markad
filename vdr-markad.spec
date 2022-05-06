@@ -1,5 +1,14 @@
+# version we want build against
+%global vdr_version 2.4.0
+%if 0%{?fedora} >= 36
+%global vdr_version 2.6.1
+%endif
+%if 0%{?fedora} == 35
+%global vdr_version 2.4.7
+%endif
+
 Name:           vdr-markad
-Version:        3.0.21
+Version:        3.0.22
 Release:        1%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
@@ -8,7 +17,7 @@ Source0:        https://github.com/kfb77/vdr-plugin-markad/archive/v%{version}.t
 Source1:        %{name}.conf
 BuildRequires:  make
 BuildRequires:  gcc-c++
-BuildRequires:  vdr-devel >= 1.7.30
+BuildRequires:  vdr-devel >= %{vdr_version}
 BuildRequires:  ffmpeg-devel >= 4.1
 Requires:       vdr(abi)%{?_isa} = %{vdr_apiversion}
 
@@ -48,6 +57,9 @@ fi
 %{vdr_vardir}/markad/
 
 %changelog
+* Fri May 06 2022 Martin Gansser <martinkg@fedoraproject.org> - 3.0.22-1
+- Update to 3.0.22
+
 * Fri Mar 25 2022 Martin Gansser <martinkg@fedoraproject.org> - 3.0.21-1
 - Update to 3.0.21
 
