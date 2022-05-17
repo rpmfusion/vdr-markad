@@ -9,7 +9,7 @@
 
 Name:           vdr-markad
 Version:        3.0.22
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 URL:            https://github.com/kfb77/vdr-plugin-markad
@@ -19,10 +19,19 @@ BuildRequires:  make
 BuildRequires:  gcc-c++
 BuildRequires:  vdr-devel >= %{vdr_version}
 BuildRequires:  ffmpeg-devel >= 4.1
+BuildRequires:  doxygen
 Requires:       vdr(abi)%{?_isa} = %{vdr_apiversion}
 
 %description
 VDR-Plugin: markad - %{summary}
+
+%package        docs
+Summary:        Documentation files for %{name}
+BuildArch:      noarch
+
+%description    docs
+The %{name}-doc package contains html documentation
+that use %{name}.
 
 %prep
 %autosetup -p 1 -n vdr-plugin-markad-%{version}
@@ -32,6 +41,11 @@ sed -i -e 's|/LC_MESSAGES/markad.mo|/LC_MESSAGES/vdr-markad.mo|' command/Makefil
 
 %build
 %make_build CFLAGS="%{optflags} -fPIC" CXXFLAGS="%{optflags} -fPIC" all
+
+# update docs
+doxygen -u command/doxygen.conf
+# build docs
+doxygen command/doxygen.conf
 
 %install
 %make_install
@@ -56,7 +70,13 @@ fi
 %{_libdir}/vdr/libvdr-markad.so.%{vdr_apiversion}
 %{vdr_vardir}/markad/
 
+%files docs
+%doc html
+
 %changelog
+* Tue May 17 2022 Martin Gansser <martinkg@fedoraproject.org> - 3.0.22-2
+- Add html docs
+
 * Fri May 06 2022 Martin Gansser <martinkg@fedoraproject.org> - 3.0.22-1
 - Update to 3.0.22
 
