@@ -1,12 +1,12 @@
 # version we want build against
 %global vdr_version 2.6.1
 %if 0%{?fedora} >= 38
-%global vdr_version 2.6.2
+%global vdr_version 2.6.3
 %endif
 
 Name:           vdr-markad
 Version:        3.0.28
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
 URL:            https://github.com/kfb77/vdr-plugin-markad
@@ -71,6 +71,9 @@ fi
 %doc html
 
 %changelog
+* Sun Dec 18 2022 Martin Gansser <martinkg@fedoraproject.org> - 3.0.28-2
+- Rebuilt for new VDR API version
+
 * Mon Dec 05 2022 Martin Gansser <martinkg@fedoraproject.org> - 3.0.28-1
 - Update to 3.0.28
 
