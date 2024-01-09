@@ -14,6 +14,7 @@ Source0:        https://github.com/kfb77/vdr-plugin-markad/archive/refs/tags/V%{
 Source1:        %{name}.conf
 BuildRequires:  make
 BuildRequires:  gcc-c++
+BuildRequires:  gettext
 BuildRequires:  vdr-devel >= %{vdr_version}
 BuildRequires:  ffmpeg-devel >= 4.1
 BuildRequires:  doxygen
@@ -73,6 +74,7 @@ fi
 %changelog
 * Mon Jan 08 2024 Martin Gansser <martinkg@fedoraproject.org> - 3.4.4-1
 - Update to 3.4.4
+- Add BR gettext for rawhide
 
 * Sun Dec 24 2023 Martin Gansser <martinkg@fedoraproject.org> - 3.4.2-1
 - Update to 3.4.2
