@@ -5,7 +5,7 @@
 %endif
 
 Name:           vdr-markad
-Version:        3.4.4
+Version:        3.4.5
 Release:        1%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
@@ -72,6 +72,9 @@ fi
 %doc html
 
 %changelog
+* Sun Jan 14 2024 Martin Gansser <martinkg@fedoraproject.org> - 3.4.5-1
+- Update to 3.4.5
+
 * Mon Jan 08 2024 Martin Gansser <martinkg@fedoraproject.org> - 3.4.4-1
 - Update to 3.4.4
 - Add BR gettext for rawhide
