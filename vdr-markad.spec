@@ -5,7 +5,7 @@
 %endif
 
 Name:           vdr-markad
-Version:        3.5.0
+Version:        3.5.1
 Release:        1%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
@@ -72,38 +72,11 @@ fi
 %doc html
 
 %changelog
+* Sun Mar 31 2024 Martin Gansser <martinkg@fedoraproject.org> - 3.5.1-1
+- Update to 3.5.1
+
 * Sun Mar 24 2024 Martin Gansser <martinkg@fedoraproject.org> - 3.5.0-1
 - Update to 3.5.0
-
-* Mon Mar 11 2024 Martin Gansser <martinkg@fedoraproject.org> - 3.4.12-1
-- Update to 3.4.12
-
-* Sun Mar 10 2024 Martin Gansser <martinkg@fedoraproject.org> - 3.4.11-1
-- Update to 3.4.11
-
-* Sat Mar 09 2024 Martin Gansser <martinkg@fedoraproject.org> - 3.4.10-1
-- Update to 3.4.10
-
-* Sun Feb 11 2024 Martin Gansser <martinkg@fedoraproject.org> - 3.4.9-1
-- Update to 3.4.9
-
-* Sat Feb 10 2024 Martin Gansser <martinkg@fedoraproject.org> - 3.4.8-1
-- Update to 3.4.8
-
-* Sun Feb 04 2024 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 3.4.7-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Mon Jan 29 2024 Martin Gansser <martinkg@fedoraproject.org> - 3.4.7-1
-- Update to 3.4.7
-
-* Fri Jan 26 2024 Martin Gansser <martinkg@fedoraproject.org> - 3.4.6-2
-- Rebuilt for new VDR API version
-
-* Sun Jan 21 2024 Martin Gansser <martinkg@fedoraproject.org> - 3.4.6-1
-- Update to 3.4.6
-
-* Sun Jan 14 2024 Martin Gansser <martinkg@fedoraproject.org> - 3.4.5-1
-- Update to 3.4.5
 
 * Sat Mar 16 2024 Martin Gansser <martinkg@fedoraproject.org> - 3.4.13-1
 - Update to 3.4.13
