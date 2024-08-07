@@ -5,7 +5,7 @@
 %endif
 
 Name:           vdr-markad
-Version:        4.0.4
+Version:        4.1.0
 Release:        1%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPLv2+
@@ -72,6 +72,9 @@ fi
 %doc html
 
 %changelog
+* Wed Aug 07 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.1.0-1
+- Update to 4.1.0
+
 * Thu Aug 01 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.0.4-1
 - Update to 4.0.4
 
