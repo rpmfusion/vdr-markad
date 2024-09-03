@@ -72,7 +72,7 @@ fi
 %doc html
 
 %changelog
-* Sun Sep 01 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.1.5-1
+* Tue Sep 03 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.1.5-1
 - Update to 4.1.5
 
 * Fri Aug 30 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.1.4-1
