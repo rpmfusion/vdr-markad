@@ -1,14 +1,17 @@
-# version we want build against
+# version we want to build against
 %global vdr_version 2.6.3
-%if 0%{?fedora} >= 40
-%global vdr_version 2.6.7
+# Set vdr_version based on Fedora version
+%if 0%{?fedora} >= 42
+%global vdr_version 2.7.2
+%elif 0%{?fedora} >= 40
+%global vdr_version 2.6.9
 %endif
 
 Name:           vdr-markad
-Version:        3.6.8
+Version:        4.2.4
 Release:        1%{?dist}
 Summary:        Advanced commercial detection for VDR
-License:        GPLv2+
+License:        GPL-2.0-or-later
 URL:            https://github.com/kfb77/vdr-plugin-markad
 Source0:        https://github.com/kfb77/vdr-plugin-markad/archive/refs/tags/V%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}.conf
@@ -72,6 +75,63 @@ fi
 %doc html
 
 %changelog
+* Sat Oct 19 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.2.4-1
+- Update to 4.2.4
+
+* Mon Oct 14 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.2.3-1
+- Update to 4.2.3
+
+* Mon Oct 07 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.2.2-1
+- Update to 4.2.2
+
+* Mon Sep 30 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.2.1-1
+- Update to 4.2.1
+
+* Wed Sep 25 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.2.0-1
+- Update to 4.2.0
+
+* Tue Sep 03 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.1.6-1
+- Update to 4.1.6
+
+* Tue Sep 03 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.1.5-1
+- Update to 4.1.5
+
+* Fri Aug 30 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.1.4-1
+- Update to 4.1.4
+
+* Wed Aug 21 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.1.3-1
+- Update to 4.1.3
+
+* Fri Aug 16 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.1.2-1
+- Update to 4.1.2
+
+* Tue Aug 13 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.1.1-1
+- Update to 4.1.1
+
+* Wed Aug 07 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.1.0-1
+- Update to 4.1.0
+
+* Thu Aug 01 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.0.4-1
+- Update to 4.0.4
+
+* Fri Jul 26 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.0.3-1
+- Update to 4.0.3
+
+* Wed Jul 24 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.0.2-2
+- Rebuilt for new VDR API version 2.6.9
+
+* Mon Jul 22 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.0.2-1
+- Update to 4.0.2
+
+* Mon Jul 15 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.0.1-1
+- Update to 4.0.1
+
+* Sun Jul 14 2024 Martin Gansser <martinkg@fedoraproject.org> - 4.0.0-1
+- Update to 4.0.0
+
+* Fri Jul 12 2024 Martin Gansser <martinkg@fedoraproject.org> - 3.6.8-2
+- Rebuilt for new VDR API version 2.6.8
+
 * Sun Jun 23 2024 Martin Gansser <martinkg@fedoraproject.org> - 3.6.8-1
 - Update to 3.6.8
 
