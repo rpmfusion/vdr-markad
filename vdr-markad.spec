@@ -1,14 +1,17 @@
 # Set vdr_version based on Fedora version
-%if 0%{?fedora} >= 43
-%global vdr_version 2.7.7
-%elif 0%{?fedora} == 42
-%global vdr_version 2.7.4
-%else
+# Default
 %global vdr_version 2.6.9
+
+%if 0%{?fedora} == 42
+%global vdr_version 2.7.4
+%elif 0%{?fedora} == 43
+%global vdr_version 2.7.7
+%elif 0%{?fedora} >= 44
+%global vdr_version 2.8.1
 %endif
 
 Name:           vdr-markad
-Version:        4.2.17
+Version:        4.2.20
 Release:        1%{?dist}
 Summary:        Advanced commercial detection for VDR
 License:        GPL-2.0-or-later
@@ -75,6 +78,27 @@ fi
 %doc html
 
 %changelog
+* Tue Apr 07 2026 Martin Gansser <martinkg@fedoraproject.org> - 4.2.20-1
+- Update to 4.2.20
+
+* Mon Mar 23 2026 Martin Gansser <martinkg@fedoraproject.org> - 4.2.19-2
+- Rebuilt for new VDR 2.8.1 API version 12
+
+* Mon Mar 02 2026 Martin Gansser <martinkg@fedoraproject.org> - 4.2.19-1
+- Update to 4.2.19
+
+* Thu Feb 19 2026 Martin Gansser <martinkg@fedoraproject.org> - 4.2.18-1
+- Update to 4.2.18
+
+* Mon Feb 09 2026 Martin Gansser <martinkg@fedoraproject.org> - 4.2.17-4
+- Rebuilt for new VDR API version 2.7.9
+
+* Tue Feb 03 2026 Martin Gansser <martinkg@fedoraproject.org> - 4.2.17-3
+- Rebuilt for new VDR API version 2.7.8
+
+* Mon Feb 02 2026 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 4.2.17-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Dec 24 2025 Martin Gansser <martinkg@fedoraproject.org> - 4.2.17-1
 - Update to 4.2.17
 
